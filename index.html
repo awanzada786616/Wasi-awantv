@@ -4,42 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     
+    <!-- LIBRARIES -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     
-    <!-- ONESIGNAL SDK -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignal.js"></script>
+    <!-- ONESIGNAL OFFICIAL SDK -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
-      // Function to trigger prompt
-      window.triggerNotification = async function() {
-          console.log("Tap detected, checking OneSignal...");
-          if (window.OneSignal) {
-              try {
-                  // User se permission mangnay ka native prompt
-                  await OneSignal.Notifications.requestPermission();
-                  console.log("Prompt shown successfully");
-              } catch (e) {
-                  console.error("OneSignal Error:", e);
-              }
-          }
-      };
-
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
           appId: "6406eb57-ad34-4dea-ae23-6d96861d3799",
           allowLocalhostAsSecureOrigin: true,
-          // Root folder wali file ka rasta
-          serviceWorkerPath: "OneSignalSDKWorker.js", 
-          serviceWorkerParam: { scope: "/" }
+          serviceWorkerPath: "OneSignalSDKWorker.js",
         });
-        console.log("OneSignal ready with Worker file.");
       });
+
+      // Notification Prompt Trigger on Click
+      window.triggerNotification = async function() {
+          if (window.OneSignal) {
+              try {
+                  await OneSignal.Notifications.requestPermission();
+              } catch (e) { console.log(e); }
+          }
+      };
     </script>
 
-    <title>Wasi TV — Pro Final</title>
+    <title>Wasi TV — Final Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -53,59 +46,60 @@
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; text-transform: uppercase; flex: 1; text-align: center; }
         .notif-bell { color: var(--primary); font-size: 20px; cursor: pointer; padding: 0 10px; }
 
-        /* Slider */
+        /* Slider Fix - No Cutting */
         #slider-container { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; position: relative; margin-top: 10px; display: none; background: #000; }
-        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.6s; }
+        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: opacity 0.6s; }
         .slide.active { opacity: 1; }
         .slide img { width: 100%; height: 100%; object-fit: contain; background: #000; }
 
+        /* Skeleton Loading */
+        .skeleton { background: #1a1a1a; background-image: linear-gradient(90deg, #1a1a1a 0px, #262626 40px, #1a1a1a 80px); background-size: 200% 100%; animation: shine 1.5s infinite linear; border-radius: 12px; height: 120px; }
+        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
         /* Grid */
         .section-title { padding: 15px 15px 5px; font-size: 14px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 15px; }
+        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 10px 15px; }
         .card { background: #fff; border-radius: 12px; overflow: hidden; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 8px; background: #fff; }
         .card.portrait img { aspect-ratio: 2/3; object-fit: cover; padding: 0; }
         .card-title { font-size: 9px; font-weight: 700; color: #000; padding: 5px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .skeleton { background: #1a1a1a; background-image: linear-gradient(90deg, #1a1a1a 0px, #262626 40px, #1a1a1a 80px); background-size: 200% 100%; animation: shine 1.5s infinite linear; border-radius: 12px; height: 120px; }
-        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        /* WhatsApp */
+        .wa-float { position: fixed; bottom: 85px; right: 20px; background: var(--wa-green); color: #fff; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-decoration: none; }
 
-        /* Player */
+        /* Tamasha Player - Forced Landscape */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; overflow: hidden; }
         #main-video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        #brightness-overlay { position: absolute; inset: 0; background: black; opacity: 0; pointer-events: none; z-index: 5; }
         #video-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; display: none; }
         .v-spinner { width: 60px; height: 60px; border: 5px solid rgba(255,152,0,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* UI */
         .ui-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 100px 1fr 100px; grid-template-rows: 60px 1fr 100px; z-index: 10; background: rgba(0,0,0,0.3); transition: 0.3s; }
         .ui-hidden { opacity: 0; pointer-events: none; }
+        .side-slider { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
         .vertical-range { appearance: slider-vertical; width: 6px; height: 140px; accent-color: var(--primary); }
+        .center-ui { grid-column: 2; display: flex; justify-content: center; align-items: center; gap: 70px; }
         .center-ui i { font-size: 55px; color: #fff; text-shadow: 0 0 15px #000; cursor: pointer; }
-        .seek-bar { width: 100%; accent-color: var(--primary); height: 5px; }
+        .bottom-ui { grid-column: 1 / span 3; padding: 0 25px 20px; display: flex; flex-direction: column; justify-content: flex-end; }
+        .seek-bar { width: 100%; accent-color: var(--primary); height: 5px; cursor: pointer; }
 
-        /* WhatsApp */
-        .wa-float { position: fixed; bottom: 85px; right: 20px; background: var(--wa-green); color: #fff; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); text-decoration: none; animation: pulse-wa 2s infinite; }
-        @keyframes pulse-wa { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* Exit Dialog */
-        #exit-dialog { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000000; display: none; justify-content: center; align-items: center; }
-        .exit-box { background: #1a1a1a; padding: 30px; border-radius: 25px; border: 1px solid var(--primary); width: 85%; max-width: 350px; text-align: center; }
+        /* Dialogs */
+        #exit-dialog, #update-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000000; display: none; justify-content: center; align-items: center; }
+        .box-style { background: #1a1a1a; padding: 30px; border-radius: 25px; border: 1px solid var(--primary); width: 85%; max-width: 350px; text-align: center; }
         .exit-img { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 15px; border: 2px solid var(--primary); object-fit: cover; }
         .btn-main { background: var(--primary); color: #000; padding: 12px 25px; border-radius: 10px; font-weight: 900; text-decoration: none; cursor: pointer; margin: 10px; display: inline-block; }
 
-        /* Bottom Nav */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #121212; display: flex; padding: 10px 0; border-top: 1px solid #333; z-index: 2000; }
         .nav-item { color: #888; text-align: center; flex: 1; font-size: 10px; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
 
-        #update-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 100000001; display: none; justify-content: center; align-items: center; }
         #ep-modal { position: fixed; inset: 0; background: #000; z-index: 5000; display: none; overflow-y: auto; }
         .ep-card { background: #1a1a1a; padding: 15px; margin: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
     </style>
 </head>
-<body onclick="triggerNotification()"> <!-- Pura screen touch trigger hai -->
+<body onclick="triggerNotification()">
 
     <header>
         <div style="width: 40px;"></div>
@@ -118,35 +112,56 @@
         <div class="playlist-grid"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
     </div>
 
+    <!-- WhatsApp Button -->
     <a href="https://wa.me/923342002756" class="wa-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
 
     <!-- Player -->
     <div id="player-overlay" onclick="toggleUI(event)">
+        <div id="brightness-overlay"></div>
         <div id="video-spinner"><div class="v-spinner"></div></div>
         <video id="main-video" playsinline></video>
         <div class="ui-grid" id="player-ui">
             <div style="grid-column: 1/span 3; padding: 25px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display:flex; align-items:center; gap:15px;"><i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:22px; cursor:pointer;"></i><span id="p-title" style="font-weight:bold;">Wasi TV</span></div>
+                <div style="display:flex; align-items:center; gap:15px;"><i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:22px; cursor:pointer;"></i><span id="p-title" style="font-weight:bold; font-size:18px;">Wasi TV</span></div>
                 <i class="fa-solid fa-lock" id="lock-icon" onclick="toggleLock(this)" style="font-size:20px; cursor:pointer;"></i>
             </div>
-            <div style="display:flex; align-items:center; justify-content:center;"><input type="range" class="vertical-range" min="0" max="0.8" step="0.01" value="0" oninput="$('#player-overlay').find('#brightness-overlay').css('opacity', this.value)"></div>
-            <div class="center-ui"><i class="fa-solid fa-rotate-left" onclick="video.currentTime -= 10"></i><i class="fa-solid fa-play" id="pp-btn" onclick="video.paused ? video.play() : video.pause()"></i><i class="fa-solid fa-rotate-right" onclick="video.currentTime += 10"></i></div>
-            <div style="display:flex; align-items:center; justify-content:center;"><input type="range" class="vertical-range" min="0" max="1" step="0.1" value="1" oninput="video.volume = this.value"></div>
-            <div class="bottom-ui"><input type="range" class="seek-bar" id="seekbar" min="0" max="100" value="0" oninput="video.currentTime = (this.value/100)*video.duration"><div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px; font-weight:bold;"><span id="curr-time">00:00</span><span id="dur-time">LIVE</span></div></div>
+            <div class="side-slider"><i class="fa-solid fa-sun" style="font-size:10px;"></i><input type="range" class="vertical-range" min="0" max="0.8" step="0.01" value="0" oninput="setBrightness(this.value)"></div>
+            <div class="center-ui"><i class="fa-solid fa-rotate-left" onclick="seekVideo(-10)"></i><i class="fa-solid fa-play" id="pp-btn" onclick="togglePlay()"></i><i class="fa-solid fa-rotate-right" onclick="seekVideo(10)"></i></div>
+            <div class="side-slider"><i class="fa-solid fa-volume-high" style="font-size:10px;"></i><input type="range" class="vertical-range" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)"></div>
+            <div class="bottom-ui"><input type="range" class="seek-bar" id="seekbar" min="0" max="100" value="0" oninput="manualSeek(this.value)"><div style="display:flex; justify-content:space-between; margin-top:10px; font-size:13px; font-weight:bold;"><span id="curr-time">00:00</span><span id="dur-time">LIVE</span></div></div>
         </div>
-        <div id="brightness-overlay" style="position: absolute; inset: 0; background: black; opacity: 0; pointer-events: none; z-index: 5;"></div>
     </div>
 
     <!-- Exit Dialog -->
     <div id="exit-dialog">
-        <div class="exit-box">
+        <div class="box-style">
             <img src="https://i.ibb.co/KpDxB12y/wavehand.webp" class="exit-img" alt="Goodbye">
             <h3 style="margin:0">App Band Karein?</h3>
+            <p style="color:#aaa; font-size:13px; margin-top:5px;">Kya aap Wasi TV band karna chahte hain?</p>
             <div style="display:flex; justify-content:center; margin-top:15px">
                 <div class="btn-main" style="background:#333; color:#fff" onclick="$('#exit-dialog').hide()">NAHI</div>
                 <div class="btn-main" onclick="finalExit()">HAAN</div>
             </div>
         </div>
+    </div>
+
+    <!-- Update Popup -->
+    <div id="update-popup">
+        <div class="box-style">
+            <i class="fa-solid fa-cloud-arrow-down" style="font-size:50px; color:var(--primary)"></i>
+            <h2 style="margin:10px 0">New Update!</h2>
+            <p id="up-text" style="color:#aaa; font-size:14px;">Update karna zaroori hai.</p>
+            <a id="up-link" href="#" class="btn-main">UPDATE NOW</a>
+        </div>
+    </div>
+
+    <!-- Episode Modal -->
+    <div id="ep-modal">
+        <div style="padding:16px; border-bottom:1px solid #333; position:sticky; top:0; background:#000; display:flex; align-items:center;">
+            <i class="fa-solid fa-arrow-left" style="font-size:22px; margin-right:15px;" onclick="closeEpModal()"></i>
+            <h2 id="ep-title-header" style="margin:0; font-size:18px; color:var(--primary); flex:1;">Episodes</h2>
+        </div>
+        <div id="ep-list-content"></div>
     </div>
 
     <!-- Bottom Nav -->
@@ -172,6 +187,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Update listener
+        db.ref('app_settings').on('value', (s) => {
+            const d = s.val();
+            if(d && d.update_url && d.update_url !== "") {
+                $('#up-text').text(d.update_msg || "New version available.");
+                $('#up-link').attr('href', d.update_url);
+                $('#update-popup').show();
+            } else { $('#update-popup').hide(); }
+        });
+
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); $(el).addClass('active');
             $('#slider-container').hide().empty();
@@ -179,10 +204,10 @@
             try {
                 if (tab === 'home') {
                     const [s, sp] = await Promise.all([fetch(`${API}/slider`).then(r=>r.json()), fetch(`${API}/sports`).then(r=>r.json())]);
-                    $('#main-content').empty(); renderSlider(s); renderGrid("Live Free Sports", sp);
+                    $('#main-content').empty(); renderSlider(s); renderGrid("Live Sports", sp);
                 } else if (tab === 'tv') {
                     const d = await fetch(`${API}/feed`).then(r=>r.json());
-                    $('#main-content').empty(); renderGrid("All Channels", d.channels);
+                    $('#main-content').empty(); renderGrid("Live TV", d.channels);
                 } else if (tab === 'indian') {
                     db.ref('indian_channels').on('value', (s) => {
                         const data = s.val(); $('#main-content').empty();
@@ -216,7 +241,7 @@
         async function playStream(slug, type, name) {
             window.history.pushState({v: 'player'}, "");
             $('#p-title').text(name || "Live");
-            $('#player-overlay').show(); $('#video-spinner').show();
+            $('#player-overlay').show(); $('#video-spinner').show(); resetUI();
             try {
                 const res = await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json());
                 video.muted = false; video.volume = 1;
@@ -227,11 +252,30 @@
             } catch (e) { $('#player-overlay').hide(); }
         }
 
-        function toggleUI(e) { if(isLocked && !$(e.target).hasClass('fa-lock')) return; $('#player-ui').toggleClass('ui-hidden'); }
+        async function loadEpisodes(slug, name) {
+            window.history.pushState({v: 'ep'}, "");
+            $('#ep-modal').fadeIn(250); $('#ep-title-header').text(name);
+            $('#ep-list-content').html('<div style="text-align:center;padding:50px;"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:35px; color:var(--primary)"></i></div>');
+            try {
+                const d = await fetch(`${API}/program?slug=${slug}`).then(r => r.json());
+                let html = d.episodes.map(ep => `<div class="ep-card" onclick="playStream('${ep.slug}', 'episode', '${ep.name.replace(/'/g,"")}')"><span>${ep.name}</span><i class="fa-solid fa-circle-play" style="color:var(--primary); font-size:25px;"></i></div>`).join('');
+                $('#ep-list-content').html(html || '<p style="text-align:center">Empty</p>');
+            } catch (e) { $('#ep-list-content').text('Error!'); }
+        }
+
+        function toggleUI(e) { if(isLocked && !$(e.target).hasClass('fa-lock')) return; $('#player-ui').toggleClass('ui-hidden'); resetUI(); }
+        function resetUI() { clearTimeout(uiTimer); if(!$('#player-ui').hasClass('ui-hidden')) uiTimer = setTimeout(() => { if(!video.paused) $('#player-ui').addClass('ui-hidden'); }, 4000); }
         function closePlayer() { video.pause(); video.src = ""; $('#player-overlay').hide(); window.history.back(); }
+        function closeEpModal() { $('#ep-modal').fadeOut(250); window.history.back(); }
+        function togglePlay() { video.paused ? video.play() : video.pause(); }
+        function seekVideo(s) { video.currentTime += s; }
+        function setVolume(v) { video.volume = v; }
+        function setBrightness(b) { $('#brightness-overlay').css('opacity', b); }
         function toggleLock(el) { isLocked = !isLocked; $(el).toggleClass('fa-lock fa-lock-open'); }
+        function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
+
         video.onplaying = () => { $('#video-spinner').hide(); $('#pp-btn').attr('class', 'fa-solid fa-pause'); };
-        video.onpause = () => { $('#pp-btn').attr('class', 'fa-solid fa-play'); };
+        video.onpause = () => { $('#pp-btn').attr('class', 'fa-solid fa-play'); $('#player-ui').removeClass('ui-hidden'); };
         video.onwaiting = () => $('#video-spinner').show();
         video.ontimeupdate = () => { 
             $('#seekbar').val((video.currentTime/video.duration)*100 || 0); 
@@ -240,13 +284,14 @@
         };
 
         function startSlider() { clearInterval(sliderInt); sliderInt = setInterval(() => { let cur = $('.slide.active'), nxt = cur.next('.slide').length ? cur.next('.slide') : $('.slide').first(); cur.removeClass('active'); nxt.addClass('active'); }, 4000); }
-        function handleItem(slug, type, name) { playStream(slug, type || 'channel', name); }
+        function handleItem(slug, type, name) { if (type === 'program' || type === 'series') loadEpisodes(slug, name); else playStream(slug, type || 'channel', name); }
         function finalExit() { if(navigator.app) { navigator.app.exitApp(); } else { window.close(); document.body.innerHTML = "GOODBYE!"; } }
 
         window.history.pushState({v: 'h'}, "");
         window.onpopstate = () => {
-            if($('#player-overlay').is(':visible')) closePlayer();
-            else $('#exit-dialog').show();
+            if($('#player-overlay').is(':visible')) { $('#player-overlay').hide(); video.pause(); }
+            else if($('#ep-modal').is(':visible')) { $('#ep-modal').fadeOut(); }
+            else { $('#exit-dialog').show(); }
             window.history.pushState({v: 'h'}, "");
         };
 
