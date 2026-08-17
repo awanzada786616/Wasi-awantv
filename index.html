@@ -11,70 +11,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — White Pro</title>
+    <title>Wasi TV — White Ultimate</title>
 
     <style>
-        :root { --primary: #ff9800; --bg: #ffffff; --text: #000000; --card-bg: #ffffff; }
+        :root { --primary: #ff9800; --bg: #ffffff; --text: #000000; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
 
-        /* HEADER */
-        header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
-        /* SKELETON (Light Version) */
-        .skeleton { background: #eee; background-image: linear-gradient(90deg, #eee 0px, #f5f5f5 40px, #eee 80px); background-size: 200% 100%; animation: shine 1.5s infinite linear; border-radius: 12px; height: 110px; width: 100%; }
-        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        /* NOTIFICATION BELL & BADGE */
+        .notif-btn { position: relative; cursor: pointer; font-size: 22px; color: var(--primary); padding: 5px; }
+        #notif-badge { position: absolute; top: 0; right: 0; background: red; color: #fff; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
 
-        /* GRID */
+        /* SLIDER CSS */
+        #slider-container { width: 95%; aspect-ratio: 16 / 8; margin: 10px auto; border-radius: 15px; overflow: hidden; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; }
+        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.8s ease; }
+        .slide.active { opacity: 1; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* SKELETON */
+        .skeleton { background: #f0f0f0; border-radius: 12px; height: 110px; animation: shine 1.5s infinite; }
+        @keyframes shine { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
         .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
-        .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; text-align: center; cursor: pointer; border: 1px solid #f0f0f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+        .card { background: #fff; border-radius: 10px; text-align: center; border: 1px solid #eee; box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 8px; }
-        .card-title { font-size: 10px; font-weight: 700; color: #333; padding: 6px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-title { font-size: 10px; font-weight: 700; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* --- PRO PLAYER (Screenshot Design + Spinner) --- */
+        /* PLAYER OVERLAY */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; touch-action: none; }
         #main-video { width: 100%; height: 100%; background: #000; }
         
-        /* GESTURE SPINNER (The 100% Box) */
-        #gesture-box { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 85px; height: 85px; background: rgba(0,0,0,0.85); border-radius: 50%; 
-            display: none; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 1000; border: 2px solid var(--primary); color: #fff;
-        }
-        #gesture-box i { font-size: 24px; margin-bottom: 4px; }
-        #gesture-box span { font-weight: 900; font-size: 15px; }
+        /* GESTURE INDICATOR */
+        #gesture-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 50%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; border: 2px solid var(--primary); color: #fff; }
 
-        /* LOADING SPINNER */
-        #video-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; }
-        .v-spin { width: 55px; height: 55px; border: 4px solid rgba(255,152,0,0.2); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        /* --- CIRCULAR BUTTON SPINNER --- */
+        .play-wrapper { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+        #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; }
+        #btn-loader { position: absolute; inset: 0; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .player-ui { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; color: #fff; }
+        .player-ui { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; color: #fff; }
         .ui-hidden { opacity: 0; pointer-events: none; }
         
-        .p-top { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
-        .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 40px; }
-        .p-center i { font-size: 35px; text-shadow: 0 0 10px #000; }
-        .p-center .fa-circle-play, .p-center .fa-circle-pause { font-size: 65px; }
+        .p-top { padding: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 50px; }
+        .p-bottom { padding: 20px 40px; }
+        .p-seekbar { width: 100%; accent-color: var(--primary); height: 4px; }
 
-        .p-bottom { padding: 15px 25px 25px; }
-        .p-seekbar { width: 100%; accent-color: #fff; height: 4px; }
-
-        /* INBOX / NOTIF */
-        #notif-page { display: none; padding: 15px; }
-        .notif-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; border-left: 5px solid var(--primary); }
-        .notif-card h3 { margin: 0; color: #333; font-size: 16px; }
-        .notif-card p { margin: 8px 0; font-size: 14px; color: #666; }
-
-        /* BOTTOM NAV (White) */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 2000; }
         .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: bold; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
-        
-        #brightness-overlay { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 5; }
     </style>
 </head>
 <body>
@@ -82,53 +72,52 @@
     <header>
         <div style="width: 40px;"></div>
         <h1>Wasi TV</h1>
-        <i class="fa-solid fa-bell" onclick="loadTab('notif', this)" style="color:var(--primary); font-size:20px;"></i>
+        <div class="notif-btn" onclick="loadTab('notif', this)">
+            <i class="fa-solid fa-bell"></i>
+            <span id="notif-badge">0</span>
+        </div>
     </header>
 
+    <!-- HOME SLIDER -->
+    <div id="slider-container"></div>
+
     <div id="main-content"></div>
-    <div id="notif-page">
-        <h2 style="margin-left:10px;">Inbox</h2>
+    <div id="notif-page" style="display:none; padding:15px;">
+        <h2 style="color:var(--primary)">Inbox</h2>
         <div id="notif-list"></div>
     </div>
 
-    <!-- PLAYER OVERLAY -->
-    <div id="player-overlay">
-        <div id="brightness-overlay"></div>
-        
-        <!-- Center Gesture Box (Spinner) -->
-        <div id="gesture-box">
-            <i id="gesture-icon" class="fa-solid fa-volume-high"></i>
-            <span id="gesture-percent">100%</span>
-        </div>
-
-        <div id="video-spinner"><div class="v-spin"></div></div>
-        
+    <!-- PLAYER -->
+    <div id="player-overlay" onclick="togglePlayerUI()">
+        <div id="gesture-box"><i class="fa-solid fa-volume-high"></i><span id="gesture-percent">100%</span></div>
         <video id="main-video" playsinline></video>
 
-        <div class="player-ui" onclick="$('.player-ui').toggleClass('ui-hidden')">
+        <div class="player-ui">
             <div class="p-top">
                 <i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:24px;"></i>
-                <span id="p-title" style="font-weight:bold; flex:1; margin-left:15px;">Live Stream</span>
+                <span id="p-title" style="font-weight:bold; flex:1; margin-left:15px;">Live</span>
                 <i class="fa-solid fa-gear"></i>
             </div>
             
             <div class="p-center">
                 <i class="fa-solid fa-rotate-left" onclick="event.stopPropagation(); video.currentTime -= 5"></i>
-                <i class="fa-solid fa-circle-pause" id="pp-btn" onclick="event.stopPropagation(); togglePlay()"></i>
+                <div class="play-wrapper">
+                    <div id="btn-loader"></div>
+                    <i class="fa-solid fa-circle-pause" id="pp-btn" onclick="event.stopPropagation(); togglePlay()"></i>
+                </div>
                 <i class="fa-solid fa-rotate-right" onclick="event.stopPropagation(); video.currentTime += 15"></i>
             </div>
 
             <div class="p-bottom">
                 <input type="range" class="p-seekbar" id="seekbar" min="0" max="100" value="0" oninput="event.stopPropagation(); manualSeek(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:8px; font-weight:bold;">
-                    <span id="curr-time">00:00</span>
-                    <span id="dur-time">LIVE</span>
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:5px; font-weight:bold;">
+                    <span id="curr-time">00:00</span><span id="dur-time">LIVE</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAV -->
+    <!-- NAV -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item" onclick="loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
@@ -140,51 +129,85 @@
         const API = "https://wasitv.lovable.app/api/public";
         const video = document.getElementById('main-video');
         let hls = new Hls({ lowLatencyMode: true });
+        let sliderInt;
 
         const firebaseConfig = { databaseURL: "https://wasitv-63ff0-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // TAB LOADING (Waits for API)
+        // 1. NOTIFICATION SYSTEM WITH BADGE
+        function checkNotifications() {
+            db.ref('app_notifications').on('value', (s) => {
+                const data = s.val() || {};
+                const count = Object.keys(data).length;
+                const seen = parseInt(localStorage.getItem('seenCount') || 0);
+                
+                if (count > seen) {
+                    $('#notif-badge').text(count - seen).css('display', 'flex');
+                } else {
+                    $('#notif-badge').hide();
+                }
+            });
+        }
+
+        // 2. SLIDER LOGIC
+        async function loadSlider() {
+            try {
+                const data = await fetch(`${API}/slider`).then(r => r.json());
+                let html = '';
+                data.forEach((s, i) => {
+                    html += `<div class="slide ${i===0?'active':''}" onclick="playStream('${s.slug}','${s.type}','${s.name}')"><img src="${s.image}"></div>`;
+                });
+                $('#slider-container').html(html).show();
+                startSlider();
+            } catch(e) {}
+        }
+
+        function startSlider() {
+            clearInterval(sliderInt);
+            sliderInt = setInterval(() => {
+                let cur = $('.slide.active'), nxt = cur.next().length ? cur.next() : $('.slide').first();
+                cur.removeClass('active'); nxt.addClass('active');
+            }, 4000);
+        }
+
+        // 3. TAB MANAGEMENT
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); $(el).addClass('active');
-            $('#main-content, #notif-page').hide();
+            $('#main-content, #notif-page, #slider-container').hide();
 
-            if(tab === 'notif') { $('#notif-page').show(); loadInbox(); return; }
+            if (tab === 'home') { loadSlider(); fetchGrid(`${API}/sports`); }
+            else if (tab === 'tv') fetchGrid(`${API}/feed`, true);
+            else if (tab === 'missing') db.ref('missing_sports').once('value', s => renderGrid(Object.values(s.val() || {})));
+            else if (tab === 'notif') {
+                $('#notif-page').show();
+                loadInbox();
+                const count = await db.ref('app_notifications').once('value').then(s => Object.keys(s.val() || {}).length);
+                localStorage.setItem('seenCount', count);
+                $('#notif-badge').hide();
+            }
+        }
 
-            $('#main-content').show().html('<div class="playlist-grid">' + Array(9).fill('<div class="skeleton"></div>').join('') + '</div>');
-
-            try {
-                let data;
-                if(tab === 'home') data = await fetch(`${API}/sports`).then(r=>r.json());
-                else if(tab === 'tv') { let r = await fetch(`${API}/feed`).then(r=>r.json()); data = r.channels; }
-                else if(tab === 'missing') {
-                    db.ref('missing_sports').once('value', s => { renderGrid(Object.values(s.val() || {})); });
-                    return;
-                }
-                renderGrid(data);
-            } catch(e) { console.log("Still waiting for API..."); }
+        async function fetchGrid(url, isTV = false) {
+            $('#main-content').show().html('<div class="playlist-grid">' + Array(6).fill('<div class="skeleton"></div>').join('') + '</div>');
+            const r = await fetch(url).then(r=>r.json());
+            renderGrid(isTV ? r.channels : r);
         }
 
         function renderGrid(items) {
-            if(!items || items.length === 0) { $('#main-content').html('<p style="text-align:center; padding:50px;">No Content Found</p>'); return; }
             let html = '<div class="playlist-grid">';
             items.forEach(i => {
-                const name = i.name || i.channelName;
-                const img = i.image || i.logo;
-                const slug = i.slug || i.channelSlug;
-                html += `<div class="card" onclick="playStream('${slug}', '${i.type || 'channel'}', '${name}')">
-                    <img src="${img}" loading="lazy"><div class="card-title">${name}</div>
-                </div>`;
+                const n = i.name || i.channelName, img = i.image || i.logo, s = i.slug || i.channelSlug;
+                html += `<div class="card" onclick="playStream('${s}', '${i.type||'channel'}', '${n}')"><img src="${img}"><div class="card-title">${n}</div></div>`;
             });
             $('#main-content').html(html + '</div>');
         }
 
-        // PLAYER LOGIC
+        // 4. PLAYER & GESTURES
         async function playStream(slug, type, name) {
             $('#p-title').text(name);
             $('#player-overlay').show();
-            $('#video-spinner').show();
+            $('#btn-loader').show();
             
             let url = slug.startsWith('http') ? slug : (await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json())).url;
 
@@ -195,64 +218,50 @@
             } else { video.src = url; video.play(); }
         }
 
-        // GESTURES (LEFT: Brightness, RIGHT: Volume)
-        let startY, startVal;
-        const player = document.getElementById('player-overlay');
-        player.addEventListener('touchstart', e => {
+        function togglePlayerUI() { $('.player-ui').toggleClass('ui-hidden'); }
+
+        // Volume Gesture Logic
+        let startY, startVol;
+        document.getElementById('player-overlay').addEventListener('touchstart', e => {
             startY = e.touches[0].pageY;
-            const x = e.touches[0].pageX;
-            if (x < window.innerWidth / 2) { 
-                startVal = video.volume;
-                $('#gesture-icon').attr('class', 'fa-solid fa-volume-high');
-            } else { 
-                startVal = parseFloat($('#brightness-overlay').css('opacity'));
-                $('#gesture-icon').attr('class', 'fa-solid fa-sun');
-            }
+            startVol = video.volume;
         });
-
-        player.addEventListener('touchmove', e => {
+        document.getElementById('player-overlay').addEventListener('touchmove', e => {
             const diff = (startY - e.touches[0].pageY) / 200;
-            const x = e.touches[0].pageX;
+            let v = Math.min(1, Math.max(0, startVol + diff));
+            video.volume = v;
             $('#gesture-box').css('display', 'flex');
-            
-            if (x < window.innerWidth / 2) {
-                let v = Math.min(1, Math.max(0, startVal + diff));
-                video.volume = v;
-                $('#gesture-percent').text(Math.round(v * 100) + "%");
-            } else {
-                let b = Math.min(0.9, Math.max(0, startVal - diff));
-                $('#brightness-overlay').css('opacity', b);
-                $('#gesture-percent').text(Math.round((1-b)*100) + "%");
-            }
+            $('#gesture-percent').text(Math.round(v * 100) + "%");
         });
-        player.addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
+        document.getElementById('player-overlay').addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
 
-        // UTILS
-        function togglePlay() { 
-            if(video.paused) { video.play(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); }
-            else { video.pause(); $('#pp-btn').attr('class', 'fa-solid fa-circle-play'); }
-        }
-        function closePlayer() { video.pause(); $('#player-overlay').hide(); }
-        function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
-        
-        video.onplaying = () => $('#video-spinner').hide();
+        // Video Events
+        video.onplaying = () => { $('#btn-loader').hide(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); };
+        video.onwaiting = () => { $('#btn-loader').show(); };
         video.ontimeupdate = () => {
             $('#seekbar').val((video.currentTime/video.duration)*100 || 0);
             let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
             $('#curr-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
 
+        function togglePlay() { video.paused ? video.play() : video.pause(); }
+        function closePlayer() { video.pause(); $('#player-overlay').hide(); }
+        function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
+
         function loadInbox() {
-            db.ref('app_notifications').on('value', (s) => {
+            db.ref('app_notifications').once('value', (s) => {
                 let html = '';
                 if(s.val()) Object.values(s.val()).reverse().forEach(n => {
-                    html += `<div class="notif-card"><h3>${n.title}</h3><p>${n.message}</p><span>${n.time || ''}</span></div>`;
+                    html += `<div style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:10px; border-left:5px solid var(--primary)"><h3>${n.title}</h3><p>${n.message}</p></div>`;
                 });
-                $('#notif-list').html(html || '<p style="text-align:center">Empty</p>');
+                $('#notif-list').html(html || 'No messages');
             });
         }
 
-        $(document).ready(() => loadTab('home', $('.nav-item').first()));
+        $(document).ready(() => {
+            checkNotifications();
+            loadTab('home', $('.nav-item').first());
+        });
     </script>
 </body>
 </html>
