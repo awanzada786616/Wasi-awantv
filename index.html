@@ -11,50 +11,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — Pro Final Fix</title>
+    <title>Wasi TV — White Pro</title>
 
     <style>
-        :root { --primary: #ff9800; --bg: #000; }
+        :root { --primary: #ff9800; --bg: #ffffff; --text: #000000; --card-bg: #ffffff; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: #fff; padding-bottom: 80px; overflow-x: hidden; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
 
-        header { padding: 12px; text-align: center; background: #121212; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        /* HEADER */
+        header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
-        .skeleton { background: #1a1a1a; background-image: linear-gradient(90deg, #1a1a1a 0px, #262626 40px, #1a1a1a 80px); background-size: 200% 100%; animation: shine 1.2s infinite linear; border-radius: 12px; height: 110px; width: 100%; }
+        /* SKELETON (Light Version) */
+        .skeleton { background: #eee; background-image: linear-gradient(90deg, #eee 0px, #f5f5f5 40px, #eee 80px); background-size: 200% 100%; animation: shine 1.5s infinite linear; border-radius: 12px; height: 110px; width: 100%; }
         @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 15px; }
-        .card { background: #fff; border-radius: 8px; overflow: hidden; text-align: center; cursor: pointer; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 5px; background: #fff; }
-        .card-title { font-size: 10px; font-weight: 700; color: #000; padding: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* GRID */
+        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
+        .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; text-align: center; cursor: pointer; border: 1px solid #f0f0f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 8px; }
+        .card-title { font-size: 10px; font-weight: 700; color: #333; padding: 6px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* PLAYER UI (Screenshot Style) */
-        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; }
+        /* --- PRO PLAYER (Screenshot Design + Spinner) --- */
+        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; touch-action: none; }
         #main-video { width: 100%; height: 100%; background: #000; }
-        .player-ui { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; transition: 0.3s; }
+        
+        /* GESTURE SPINNER (The 100% Box) */
+        #gesture-box { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            width: 85px; height: 85px; background: rgba(0,0,0,0.85); border-radius: 50%; 
+            display: none; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 1000; border: 2px solid var(--primary); color: #fff;
+        }
+        #gesture-box i { font-size: 24px; margin-bottom: 4px; }
+        #gesture-box span { font-weight: 900; font-size: 15px; }
+
+        /* LOADING SPINNER */
+        #video-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; }
+        .v-spin { width: 55px; height: 55px; border: 4px solid rgba(255,152,0,0.2); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .player-ui { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; color: #fff; }
         .ui-hidden { opacity: 0; pointer-events: none; }
-        .p-top { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .p-top { padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; }
         .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 40px; }
-        .p-center i { color: #fff; font-size: 35px; }
-        .p-center .fa-circle-pause, .p-center .fa-circle-play { font-size: 60px; }
-        .p-bottom { padding: 20px; }
-        .p-seekbar { width: 100%; accent-color: var(--primary); }
+        .p-center i { font-size: 35px; text-shadow: 0 0 10px #000; }
+        .p-center .fa-circle-play, .p-center .fa-circle-pause { font-size: 65px; }
 
-        /* NOTIFICATION STYLING */
+        .p-bottom { padding: 15px 25px 25px; }
+        .p-seekbar { width: 100%; accent-color: #fff; height: 4px; }
+
+        /* INBOX / NOTIF */
         #notif-page { display: none; padding: 15px; }
-        .notif-card { background: #1a1a1a; padding: 15px; border-radius: 10px; margin-bottom: 12px; border-left: 4px solid var(--primary); animation: slideIn 0.3s ease; }
-        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .notif-card h3 { margin: 0; font-size: 16px; color: var(--primary); }
-        .notif-card p { margin: 5px 0; font-size: 13px; color: #bbb; }
-        .notif-time { font-size: 10px; color: #666; }
+        .notif-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #eee; border-left: 5px solid var(--primary); }
+        .notif-card h3 { margin: 0; color: #333; font-size: 16px; }
+        .notif-card p { margin: 8px 0; font-size: 14px; color: #666; }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #121212; display: flex; padding: 10px 0; border-top: 1px solid #333; z-index: 2000; }
-        .nav-item { color: #888; text-align: center; flex: 1; font-size: 10px; }
+        /* BOTTOM NAV (White) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: bold; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
         
-        .error-btn { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+        #brightness-overlay { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; z-index: 5; }
     </style>
 </head>
 <body>
@@ -62,33 +82,45 @@
     <header>
         <div style="width: 40px;"></div>
         <h1>Wasi TV</h1>
-        <i class="fa-solid fa-rotate" onclick="location.reload()" style="color:var(--primary); font-size:18px;"></i>
+        <i class="fa-solid fa-bell" onclick="loadTab('notif', this)" style="color:var(--primary); font-size:20px;"></i>
     </header>
 
     <div id="main-content"></div>
-    
     <div id="notif-page">
-        <h2 style="color:var(--primary); margin-left: 10px;">Inbox</h2>
+        <h2 style="margin-left:10px;">Inbox</h2>
         <div id="notif-list"></div>
     </div>
 
-    <!-- PLAYER -->
-    <div id="player-overlay" onclick="$('.player-ui').toggleClass('ui-hidden')">
+    <!-- PLAYER OVERLAY -->
+    <div id="player-overlay">
+        <div id="brightness-overlay"></div>
+        
+        <!-- Center Gesture Box (Spinner) -->
+        <div id="gesture-box">
+            <i id="gesture-icon" class="fa-solid fa-volume-high"></i>
+            <span id="gesture-percent">100%</span>
+        </div>
+
+        <div id="video-spinner"><div class="v-spin"></div></div>
+        
         <video id="main-video" playsinline></video>
-        <div class="player-ui">
+
+        <div class="player-ui" onclick="$('.player-ui').toggleClass('ui-hidden')">
             <div class="p-top">
                 <i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:24px;"></i>
-                <span id="p-title" style="font-weight:bold;">Channel</span>
+                <span id="p-title" style="font-weight:bold; flex:1; margin-left:15px;">Live Stream</span>
                 <i class="fa-solid fa-gear"></i>
             </div>
+            
             <div class="p-center">
-                <i class="fa-solid fa-rotate-left" onclick="video.currentTime -= 5"></i>
-                <i class="fa-solid fa-circle-pause" id="pp-btn" onclick="togglePlay()"></i>
-                <i class="fa-solid fa-rotate-right" onclick="video.currentTime += 15"></i>
+                <i class="fa-solid fa-rotate-left" onclick="event.stopPropagation(); video.currentTime -= 5"></i>
+                <i class="fa-solid fa-circle-pause" id="pp-btn" onclick="event.stopPropagation(); togglePlay()"></i>
+                <i class="fa-solid fa-rotate-right" onclick="event.stopPropagation(); video.currentTime += 15"></i>
             </div>
+
             <div class="p-bottom">
-                <input type="range" class="p-seekbar" id="seekbar" min="0" max="100" value="0" oninput="manualSeek(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:5px;">
+                <input type="range" class="p-seekbar" id="seekbar" min="0" max="100" value="0" oninput="event.stopPropagation(); manualSeek(this.value)">
+                <div style="display:flex; justify-content:space-between; font-size:13px; margin-top:8px; font-weight:bold;">
                     <span id="curr-time">00:00</span>
                     <span id="dur-time">LIVE</span>
                 </div>
@@ -96,7 +128,7 @@
         </div>
     </div>
 
-    <!-- NAV -->
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item" onclick="loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
@@ -107,99 +139,55 @@
     <script>
         const API = "https://wasitv.lovable.app/api/public";
         const video = document.getElementById('main-video');
-        let hls = new Hls();
+        let hls = new Hls({ lowLatencyMode: true });
 
         const firebaseConfig = { databaseURL: "https://wasitv-63ff0-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. FAST LOADING WITH TIMEOUT
-        async function smartFetch(url, cacheKey) {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 8000); // 8 sec timeout
-
-            try {
-                const response = await fetch(url, { signal: controller.signal });
-                const data = await response.json();
-                localStorage.setItem(cacheKey, JSON.stringify(data));
-                clearTimeout(id);
-                return data;
-            } catch (e) {
-                console.log("Fetch failed, using cache");
-                return JSON.parse(localStorage.getItem(cacheKey));
-            }
-        }
-
+        // TAB LOADING (Waits for API)
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); $(el).addClass('active');
             $('#main-content, #notif-page').hide();
-            
+
             if(tab === 'notif') { $('#notif-page').show(); loadInbox(); return; }
-            
+
             $('#main-content').show().html('<div class="playlist-grid">' + Array(9).fill('<div class="skeleton"></div>').join('') + '</div>');
 
-            let data;
-            if(tab === 'home') data = await smartFetch(`${API}/sports`, 'h_cache');
-            else if(tab === 'tv') { 
-                let raw = await smartFetch(`${API}/feed`, 't_cache');
-                data = raw ? raw.channels : null;
-            }
-            else if(tab === 'missing') { loadMissing(); return; }
-
-            if(data) renderGrid(data);
-            else $('#main-content').html('<div style="text-align:center; padding:50px;"><p>Network Error!</p><button class="error-btn" onclick="location.reload()">Retry</button></div>');
+            try {
+                let data;
+                if(tab === 'home') data = await fetch(`${API}/sports`).then(r=>r.json());
+                else if(tab === 'tv') { let r = await fetch(`${API}/feed`).then(r=>r.json()); data = r.channels; }
+                else if(tab === 'missing') {
+                    db.ref('missing_sports').once('value', s => { renderGrid(Object.values(s.val() || {})); });
+                    return;
+                }
+                renderGrid(data);
+            } catch(e) { console.log("Still waiting for API..."); }
         }
 
         function renderGrid(items) {
+            if(!items || items.length === 0) { $('#main-content').html('<p style="text-align:center; padding:50px;">No Content Found</p>'); return; }
             let html = '<div class="playlist-grid">';
             items.forEach(i => {
                 const name = i.name || i.channelName;
                 const img = i.image || i.logo;
                 const slug = i.slug || i.channelSlug;
                 html += `<div class="card" onclick="playStream('${slug}', '${i.type || 'channel'}', '${name}')">
-                    <img src="${img}" onerror="this.src='https://i.ibb.co/hR0p3p5/colorshd.png'"><div class="card-title">${name}</div>
+                    <img src="${img}" loading="lazy"><div class="card-title">${name}</div>
                 </div>`;
             });
             $('#main-content').html(html + '</div>');
         }
 
-        // 2. REAL-TIME NOTIFICATIONS (FIXED)
-        function loadInbox() {
-            $('#notif-list').html('<div class="skeleton" style="height:60px; margin:10px;"></div>');
-            db.ref('app_notifications').on('value', (snapshot) => {
-                const data = snapshot.val();
-                let html = '';
-                if(data) {
-                    Object.values(data).reverse().forEach(n => {
-                        html += `<div class="notif-card">
-                            <h3>${n.title}</h3>
-                            <p>${n.message}</p>
-                            <span class="notif-time">${n.time || 'Just now'}</span>
-                        </div>`;
-                    });
-                    $('#notif-list').html(html);
-                } else {
-                    $('#notif-list').html('<p style="text-align:center; margin-top:20px;">No messages in inbox.</p>');
-                }
-            }, (error) => {
-                $('#notif-list').html('<p>Firebase Error: Check Connection</p>');
-            });
-        }
-
-        // 3. MISSING SPORTS (FIXED)
-        function loadMissing() {
-            db.ref('missing_sports').once('value', (s) => {
-                const data = s.val();
-                if(data) renderGrid(Object.values(data));
-                else $('#main-content').html('<p style="text-align:center; padding:20px;">No Live Events</p>');
-            });
-        }
-
-        // 4. PLAYER LOGIC
+        // PLAYER LOGIC
         async function playStream(slug, type, name) {
             $('#p-title').text(name);
             $('#player-overlay').show();
+            $('#video-spinner').show();
+            
             let url = slug.startsWith('http') ? slug : (await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json())).url;
+
             if (Hls.isSupported()) {
                 hls.destroy(); hls = new Hls();
                 hls.loadSource(url); hls.attachMedia(video);
@@ -207,18 +195,62 @@
             } else { video.src = url; video.play(); }
         }
 
+        // GESTURES (LEFT: Brightness, RIGHT: Volume)
+        let startY, startVal;
+        const player = document.getElementById('player-overlay');
+        player.addEventListener('touchstart', e => {
+            startY = e.touches[0].pageY;
+            const x = e.touches[0].pageX;
+            if (x < window.innerWidth / 2) { 
+                startVal = video.volume;
+                $('#gesture-icon').attr('class', 'fa-solid fa-volume-high');
+            } else { 
+                startVal = parseFloat($('#brightness-overlay').css('opacity'));
+                $('#gesture-icon').attr('class', 'fa-solid fa-sun');
+            }
+        });
+
+        player.addEventListener('touchmove', e => {
+            const diff = (startY - e.touches[0].pageY) / 200;
+            const x = e.touches[0].pageX;
+            $('#gesture-box').css('display', 'flex');
+            
+            if (x < window.innerWidth / 2) {
+                let v = Math.min(1, Math.max(0, startVal + diff));
+                video.volume = v;
+                $('#gesture-percent').text(Math.round(v * 100) + "%");
+            } else {
+                let b = Math.min(0.9, Math.max(0, startVal - diff));
+                $('#brightness-overlay').css('opacity', b);
+                $('#gesture-percent').text(Math.round((1-b)*100) + "%");
+            }
+        });
+        player.addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
+
+        // UTILS
         function togglePlay() { 
             if(video.paused) { video.play(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); }
             else { video.pause(); $('#pp-btn').attr('class', 'fa-solid fa-circle-play'); }
         }
         function closePlayer() { video.pause(); $('#player-overlay').hide(); }
         function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
-
+        
+        video.onplaying = () => $('#video-spinner').hide();
         video.ontimeupdate = () => {
             $('#seekbar').val((video.currentTime/video.duration)*100 || 0);
             let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
             $('#curr-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
+
+        function loadInbox() {
+            db.ref('app_notifications').on('value', (s) => {
+                let html = '';
+                if(s.val()) Object.values(s.val()).reverse().forEach(n => {
+                    html += `<div class="notif-card"><h3>${n.title}</h3><p>${n.message}</p><span>${n.time || ''}</span></div>`;
+                });
+                $('#notif-list').html(html || '<p style="text-align:center">Empty</p>');
+            });
+        }
 
         $(document).ready(() => loadTab('home', $('.nav-item').first()));
     </script>
