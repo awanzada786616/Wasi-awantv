@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     
-    <!-- LIBRARIES -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,74 +11,67 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — Pro Final</title>
+    <title>Wasi TV — Ultra Pro</title>
 
     <style>
         :root { --primary: #ff9800; --bg: #000; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: #fff; padding-bottom: 80px; overflow-x: hidden; }
 
+        /* HEADER */
         header { padding: 12px; text-align: center; background: #121212; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; text-transform: uppercase; flex: 1; text-align: center; }
+        header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
-        /* --- SKELETON LOADING (SHINY LINE) --- */
-        .skeleton { 
-            background: #1a1a1a; 
-            background-image: linear-gradient(90deg, #1a1a1a 0px, #262626 40px, #1a1a1a 80px); 
-            background-size: 200% 100%; 
-            animation: shine 1.5s infinite linear; 
-            border-radius: 12px; 
-            height: 120px;
-            width: 100%;
-        }
+        /* LOADING SHINY BOXES */
+        .skeleton { background: #1a1a1a; background-image: linear-gradient(90deg, #1a1a1a 0px, #262626 40px, #1a1a1a 80px); background-size: 200% 100%; animation: shine 1.2s infinite linear; border-radius: 12px; height: 120px; width: 100%; }
         @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        #slider-container { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; position: relative; margin-top: 10px; display: none; background: #000; }
-        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.6s; }
-        .slide.active { opacity: 1; }
-        .slide img { width: 100%; height: 100%; object-fit: contain; }
-
-        .section-title { padding: 15px 15px 5px; font-size: 14px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
+        /* GRID & CARDS */
         .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 15px; }
-        
-        .card { background: #fff; border-radius: 12px; overflow: hidden; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 8px; background: #fff; }
-        .card.portrait img { aspect-ratio: 2/3; object-fit: cover; padding: 0; }
-        .card-title { font-size: 9px; font-weight: 700; color: #000; padding: 5px 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card { background: #fff; border-radius: 8px; overflow: hidden; text-align: center; cursor: pointer; transition: 0.2s; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 5px; background: #fff; }
+        .card-title { font-size: 10px; font-weight: 700; color: #000; padding: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* --- ADVANCED PLAYER --- */
+        /* --- SCREENSHOT STYLE PLAYER --- */
         #player-overlay { 
             display: none; position: fixed; inset: 0; background: #000; z-index: 99999; 
             width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; 
-            margin-left: 100vw; overflow: hidden; touch-action: none;
+            margin-left: 100vw; overflow: hidden;
         }
         #main-video { width: 100%; height: 100%; background: #000; object-fit: contain; }
         
-        #gesture-box {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85px; height: 85px; background: rgba(0,0,0,0.8); border-radius: 50%;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 1000; border: 2px solid var(--primary); color: #fff;
-        }
-        #gesture-box i { font-size: 26px; margin-bottom: 5px; }
-        #gesture-box span { font-weight: 900; font-size: 16px; }
-
-        .ui-wrapper { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; }
+        .player-ui { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; }
         .ui-hidden { opacity: 0; pointer-events: none; }
-        
-        .top-bar { padding: 25px; display: flex; align-items: center; gap: 15px; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
-        .center-controls { flex: 1; display: flex; justify-content: center; align-items: center; gap: 80px; }
-        .center-controls i { font-size: 55px; color: #fff; text-shadow: 0 0 15px #000; }
-        
-        .bottom-bar { padding: 25px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
-        .seek-container { display: flex; align-items: center; gap: 15px; }
-        .seek-bar { flex: 1; accent-color: var(--primary); height: 5px; }
-        
-        #brightness-dim { position: absolute; inset: 0; background: black; opacity: 0; pointer-events: none; z-index: 5; }
-        #video-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; }
-        .v-spin { width: 60px; height: 60px; border: 5px solid rgba(255,152,0,0.2); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* Top Bar */
+        .p-top { padding: 15px 25px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .p-back { font-size: 24px; color: #fff; display: flex; align-items: center; gap: 15px; }
+        .p-brand { text-align: right; }
+        .p-brand img { height: 30px; margin-bottom: 2px; }
+        .p-brand span { display: block; font-size: 14px; font-weight: bold; color: #ccc; }
+
+        /* Center Controls (Exact Screenshot Style) */
+        .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 35px; }
+        .p-center i { color: #fff; font-size: 35px; cursor: pointer; }
+        .p-center .fa-circle-play, .p-center .fa-circle-pause { font-size: 65px; }
+        .p-center .fa-rotate-left, .p-center .fa-rotate-right { position: relative; }
+        .p-center .fa-rotate-left::after { content: '5'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%); font-size: 12px; font-family: sans-serif; font-weight: bold; }
+        .p-center .fa-rotate-right::after { content: '15'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -40%); font-size: 12px; font-family: sans-serif; font-weight: bold; }
+
+        /* Bottom Controls */
+        .p-bottom { padding: 10px 25px 25px; }
+        .p-seekbar { width: 100%; accent-color: #fff; height: 4px; margin-bottom: 12px; }
+        .p-meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: bold; color: #eee; }
+        .p-icons { display: flex; gap: 20px; font-size: 18px; }
+
+        /* NOTIFICATION SECTION */
+        #notif-page { display: none; padding: 15px; }
+        .notif-card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--primary); }
+        .notif-card h3 { margin: 0 0 5px; color: var(--primary); font-size: 16px; }
+        .notif-card p { margin: 0; font-size: 14px; color: #ccc; line-height: 1.4; }
+        .notif-time { font-size: 10px; color: #666; margin-top: 10px; display: block; }
+
+        /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #121212; display: flex; padding: 10px 0; border-top: 1px solid #333; z-index: 2000; }
         .nav-item { color: #888; text-align: center; flex: 1; font-size: 10px; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
@@ -91,42 +83,49 @@
     <header>
         <div style="width: 40px;"></div>
         <h1>Wasi TV</h1>
-        <i class="fa-solid fa-bell" style="color:var(--primary); font-size:20px;"></i>
+        <i class="fa-solid fa-bell" onclick="loadTab('notif', this)" style="color:var(--primary); font-size:20px; cursor:pointer;"></i>
     </header>
 
-    <div id="slider-container"></div>
-    <div id="main-content">
-        <div class="playlist-grid">
-            <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-            <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-        </div>
+    <!-- CONTENT AREAS -->
+    <div id="main-content"></div>
+    
+    <div id="notif-page">
+        <h2 style="color:var(--primary); margin-bottom:20px;">Notifications</h2>
+        <div id="notif-list"></div>
     </div>
 
-    <!-- PLAYER -->
-    <div id="player-overlay">
-        <div id="brightness-dim"></div>
-        <div id="gesture-box">
-            <i id="gesture-icon" class="fa-solid fa-volume-high"></i>
-            <span id="gesture-percent">100%</span>
-        </div>
-        <div id="video-spinner"><div class="v-spin"></div></div>
+    <!-- 100% SCREENSHOT PLAYER -->
+    <div id="player-overlay" onclick="$('.player-ui').toggleClass('ui-hidden')">
         <video id="main-video" playsinline></video>
+        <div class="player-ui">
+            <div class="p-top">
+                <div class="p-back" onclick="closePlayer()"><i class="fa-solid fa-arrow-left"></i> <span id="p-title">Channel HD</span></div>
+                <div class="p-brand">
+                    <img src="https://i.ibb.co/hR0p3p5/colorshd.png" alt="logo" id="p-logo" onerror="this.style.display='none'">
+                    <span id="p-subtitle">Laughter Chefs S3</span>
+                </div>
+            </div>
+            
+            <div class="p-center">
+                <i class="fa-solid fa-step-backward"></i>
+                <i class="fa-solid fa-rotate-left" onclick="video.currentTime -= 5"></i>
+                <i class="fa-solid fa-circle-pause" id="pp-btn" onclick="togglePlay()"></i>
+                <i class="fa-solid fa-rotate-right" onclick="video.currentTime += 15"></i>
+                <i class="fa-solid fa-step-forward"></i>
+            </div>
 
-        <div class="ui-wrapper" id="player-ui">
-            <div class="top-bar">
-                <i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:26px;"></i>
-                <span id="p-title" style="font-weight:bold; font-size:18px; margin-left:10px;">Loading...</span>
-            </div>
-            <div class="center-controls">
-                <i class="fa-solid fa-rotate-left" onclick="video.currentTime -= 10"></i>
-                <i class="fa-solid fa-play" id="pp-btn" onclick="togglePlay()"></i>
-                <i class="fa-solid fa-rotate-right" onclick="video.currentTime += 10"></i>
-            </div>
-            <div class="bottom-bar">
-                <div class="seek-container">
-                    <span id="curr-time">00:00</span>
-                    <input type="range" class="seek-bar" id="seekbar" min="0" max="100" value="0" oninput="manualSeek(this.value)">
-                    <span id="dur-time">LIVE</span>
+            <div class="p-bottom">
+                <input type="range" class="p-seekbar" id="seekbar" min="0" max="100" value="0" oninput="manualSeek(this.value)">
+                <div class="p-meta">
+                    <div style="display:flex; gap:10px;"><span id="curr-time">-00:05</span> <span id="dur-time">00:12</span></div>
+                    <div class="p-icons">
+                        <i class="fa-solid fa-repeat"></i>
+                        <i class="fa-solid fa-volume-high"></i>
+                        <i class="fa-solid fa-gear"></i>
+                        <i class="fa-solid fa-expand"></i>
+                        <i class="fa-solid fa-closed-captioning"></i>
+                        <i class="fa-solid fa-rectangle-list"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -136,140 +135,121 @@
     <div class="bottom-nav">
         <div class="nav-item active" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item" onclick="loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
-        <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-trophy"></i>Missing Sports</div>
-        <div class="nav-item" onclick="loadTab('trending', this)"><i class="fa-solid fa-fire"></i>Trending</div>
+        <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-trophy"></i>Missing</div>
+        <div class="nav-item" onclick="loadTab('notif', this)"><i class="fa-solid fa-bell"></i>Inbox</div>
     </div>
 
     <script>
         const API = "https://wasitv.lovable.app/api/public";
         const video = document.getElementById('main-video');
-        let hls = new Hls({ lowLatencyMode: true, maxBufferLength: 20 });
+        let hls = new Hls({ lowLatencyMode: true });
 
+        // Firebase Setup
         const firebaseConfig = {
-            apiKey: "AIzaSyASMSN8ETSBhCvSNXqzEDWgiIioaU_uILU",
             databaseURL: "https://wasitv-63ff0-default-rtdb.firebaseio.com",
-            projectId: "wasitv-63ff0"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // TAB LOADING LOGIC
-        async function loadTab(tab, el) {
-            $('.nav-item').removeClass('active'); $(el).addClass('active');
-            $('#slider-container').hide().empty();
-            
-            // Show Skeleton loading shiny boxes
-            $('#main-content').html('<div class="playlist-grid">' + Array(9).fill('<div class="skeleton"></div>').join('') + '</div>');
-
-            try {
-                if (tab === 'home') {
-                    const [s, sp] = await Promise.all([fetch(`${API}/slider`).then(r=>r.json()), fetch(`${API}/sports`).then(r=>r.json())]);
-                    $('#main-content').empty(); renderSlider(s); renderGrid("Live Sports", sp);
-                } 
-                else if (tab === 'tv') {
-                    const d = await fetch(`${API}/feed`).then(r=>r.json());
-                    $('#main-content').empty(); renderGrid("Live TV Channels", d.channels);
-                } 
-                else if (tab === 'missing') {
-                    db.ref('missing_sports').on('value', (s) => {
-                        $('#main-content').empty();
-                        if(s.val()) renderGrid("Missing Sports", Object.values(s.val()));
-                        else $('#main-content').html('<p style="text-align:center; padding:20px;">No Matches Found</p>');
-                    });
-                } 
-                else {
-                    const d = await fetch(`${API}/movies`).then(r=>r.json());
-                    $('#main-content').empty(); d.forEach(sec => renderGrid(sec.title, sec.items));
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function renderGrid(title, items) {
-            if (!items || !items.length) return;
-            let html = `<div class="section-title">${title}</div><div class="playlist-grid">`;
-            items.forEach(i => {
-                const isProg = (i.type === 'program' || i.type === 'movie');
-                const slug = i.slug || i.channelSlug;
-                const name = (i.name || i.channelName).replace(/'/g, "");
-                const img = i.image || i.logo;
-                html += `<div class="card ${isProg?'portrait':''}" onclick="playStream('${slug}', '${i.type || 'channel'}', '${name}')"><img src="${img}" loading="lazy"><div class="card-title">${name}</div></div>`;
-            });
-            $('#main-content').append(html + '</div>');
-        }
-
-        function renderSlider(items) {
-            if (!items.length) return;
-            let html = '';
-            items.forEach((s, i) => { html += `<div class="slide ${i===0?'active':''}" onclick="playStream('${s.slug}', '${s.type}', '${s.name}')"><img src="${s.image}"></div>`; });
-            $('#slider-container').html(html).show();
-            startSlider();
-        }
-
-        // PLAYER LOGIC
-        async function playStream(slug, type, name) {
-            $('#p-title').text(name);
-            $('#player-overlay').show();
-            $('#video-spinner').show();
-            
-            let finalUrl = slug;
-            if(!slug.startsWith('http')) {
-                const res = await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json());
-                finalUrl = res.url;
+        // 1. FAST API LOADING (CACHING LOGIC)
+        async function fetchWithCache(key, url) {
+            const cached = localStorage.getItem(key);
+            if(cached) { 
+                renderGridData(key, JSON.parse(cached)); // Instant render from cache
             }
+            try {
+                const res = await fetch(url).then(r => r.json());
+                localStorage.setItem(key, JSON.stringify(res));
+                renderGridData(key, res); // Update with fresh data
+            } catch(e) { console.log("Fetch Error", e); }
+        }
+
+        // 2. TAB CONTROLLER
+        function loadTab(tab, el) {
+            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('#main-content, #notif-page').hide();
+            
+            if(tab === 'notif') {
+                $('#notif-page').show();
+                loadNotifications();
+                return;
+            }
+
+            $('#main-content').show().html('<div class="playlist-grid">' + Array(9).fill('<div class="skeleton"></div>').join('') + '</div>');
+            
+            if(tab === 'home') fetchWithCache('home_data', `${API}/sports`);
+            else if(tab === 'tv') fetchWithCache('tv_data', `${API}/feed`);
+            else if(tab === 'missing') loadMissingSports();
+        }
+
+        function renderGridData(key, data) {
+            let items = (key === 'tv_data') ? data.channels : data;
+            let html = '<div class="playlist-grid">';
+            items.forEach(i => {
+                const name = i.name || i.channelName;
+                const img = i.image || i.logo;
+                const slug = i.slug || i.channelSlug;
+                html += `<div class="card" onclick="playStream('${slug}', '${i.type || 'channel'}', '${name.replace(/'/g,"")}', '${img}')">
+                    <img src="${img}" loading="lazy"><div class="card-title">${name}</div>
+                </div>`;
+            });
+            $('#main-content').html(html + '</div>');
+        }
+
+        // 3. NOTIFICATION SYSTEM
+        function loadNotifications() {
+            db.ref('app_notifications').limitToLast(20).on('value', (snapshot) => {
+                const data = snapshot.val();
+                let html = '';
+                if(data) {
+                    Object.values(data).reverse().forEach(n => {
+                        html += `<div class="notif-card">
+                            <h3>${n.title}</h3>
+                            <p>${n.message}</p>
+                            <span class="notif-time">${n.time || ''}</span>
+                        </div>`;
+                    });
+                } else { html = '<p style="text-align:center">No notifications yet.</p>'; }
+                $('#notif-list').html(html);
+            });
+        }
+
+        // 4. AUTO NOTIFICATION LOGIC (Admin sets once)
+        db.ref('auto_settings').on('value', (s) => {
+            const settings = s.val();
+            if(settings && settings.last_update !== localStorage.getItem('last_notif')) {
+                // Show as local alert or update inbox
+                localStorage.setItem('last_notif', settings.last_update);
+            }
+        });
+
+        // 5. PLAYER LOGIC
+        async function playStream(slug, type, name, logo) {
+            $('#p-title').text(name);
+            $('#p-logo').attr('src', logo);
+            $('#player-overlay').show();
+            
+            let url = slug.startsWith('http') ? slug : (await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json())).url;
 
             if (Hls.isSupported()) {
                 hls.destroy(); hls = new Hls();
-                hls.loadSource(finalUrl); hls.attachMedia(video);
+                hls.loadSource(url); hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-            } else { video.src = finalUrl; video.play(); }
+            } else { video.src = url; video.play(); }
         }
 
-        // GESTURES (LEFT: Brightness, RIGHT: Volume)
-        let startY, startVal;
-        const player = document.getElementById('player-overlay');
-        player.addEventListener('touchstart', e => {
-            startY = e.touches[0].pageY;
-            const x = e.touches[0].pageX;
-            if (x < window.innerWidth / 2) { // Right side (mapped by rotation)
-                startVal = video.volume;
-                $('#gesture-icon').attr('class', 'fa-solid fa-volume-high');
-            } else { // Left side
-                startVal = parseFloat($('#brightness-dim').css('opacity'));
-                $('#gesture-icon').attr('class', 'fa-solid fa-sun');
-            }
-        });
-
-        player.addEventListener('touchmove', e => {
-            const x = e.touches[0].pageX;
-            const diff = (startY - e.touches[0].pageY) / 200;
-            $('#gesture-box').css('display', 'flex');
-            if (x < window.innerWidth / 2) {
-                let v = Math.min(1, Math.max(0, startVal + diff));
-                video.volume = v;
-                $('#gesture-percent').text(Math.round(v * 100) + "%");
-            } else {
-                let b = Math.min(0.9, Math.max(0, startVal - diff));
-                $('#brightness-dim').css('opacity', b);
-                $('#gesture-percent').text(Math.round((1-b)*100) + "%");
-            }
-        });
-        player.addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
-
-        // UTILS
-        function togglePlay() { video.paused ? video.play() : video.pause(); }
+        function togglePlay() { 
+            if(video.paused) { video.play(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); }
+            else { video.pause(); $('#pp-btn').attr('class', 'fa-solid fa-circle-play'); }
+        }
         function closePlayer() { video.pause(); $('#player-overlay').hide(); }
         function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
-        $('#player-overlay').on('click', (e) => { if(e.target.id === 'player-overlay' || e.target.id === 'main-video') $('#player-ui').toggleClass('ui-hidden'); });
-        
-        video.onplaying = () => { $('#video-spinner').hide(); $('#pp-btn').attr('class', 'fa-solid fa-pause'); };
-        video.onpause = () => { $('#pp-btn').attr('class', 'fa-solid fa-play'); };
+
         video.ontimeupdate = () => {
             $('#seekbar').val((video.currentTime/video.duration)*100 || 0);
             let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
             $('#curr-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
-
-        function startSlider() { setInterval(() => { let cur = $('.slide.active'), nxt = cur.next('.slide').length ? cur.next('.slide') : $('.slide').first(); cur.removeClass('active'); nxt.addClass('active'); }, 4000); }
 
         $(document).ready(() => loadTab('home', $('.nav-item').first()));
     </script>
