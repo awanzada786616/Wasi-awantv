@@ -11,14 +11,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — White Pro Ultimate</title>
+    <title>Wasi TV — White Ultimate Pro</title>
 
     <style>
         :root { --primary: #ff9800; --bg: #ffffff; --border: #eeeeee; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: #000; padding-bottom: 80px; overflow-x: hidden; }
 
-        /* HEADER */
         header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
@@ -28,52 +27,46 @@
 
         /* SLIDER */
         #slider-container { width: 94%; aspect-ratio: 16/8; margin: 10px auto; border-radius: 12px; overflow: hidden; position: relative; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.8s ease-in-out; }
+        .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.8s; }
         .slide.active { opacity: 1; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* GRID & CARDS */
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
-        .card { background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.03); cursor: pointer; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 10px; }
+        /* GRID & SECTION */
+        .section-title { padding: 15px 15px 0; font-size: 14px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
+        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px 15px; }
+        .card { background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; text-align: center; cursor: pointer; position: relative; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 8px; }
         .card.portrait img { aspect-ratio: 2/3; object-fit: cover; padding: 0; }
-        .card-title { font-size: 10px; font-weight: 700; color: #333; padding: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-title { font-size: 9px; font-weight: 700; color: #333; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pro-badge { position: absolute; top: 5px; right: 5px; background: #e6b800; color: #000; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px; }
 
-        /* SKELETON */
-        .skeleton { background: #f5f5f5; border-radius: 10px; height: 110px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        /* EPISODE MODAL (OVERLAY) */
+        #ep-modal { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; overflow-y: auto; padding-bottom: 50px; }
+        .ep-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; position: sticky; top: 0; background: #fff; z-index: 10; }
+        .ep-list { padding: 15px; }
+        .ep-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid #eee; font-size: 14px; font-weight: bold; }
 
-        /* --- PRO PLAYER (SCREENSHOT STYLE) --- */
+        /* PLAYER & GESTURES */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; touch-action: none; }
-        #main-video { width: 100%; height: 100%; object-fit: contain; }
-        
+        #main-video { width: 100%; height: 100%; }
         #gesture-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 50%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; border: 2px solid var(--primary); color: #fff; }
 
-        /* CENTER BUTTON WITH BORDER SPINNER */
+        /* CIRCULAR BORDER SPINNER */
         .play-wrapper { position: relative; width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; }
-        #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; }
         #btn-loader { position: absolute; inset: 0; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .player-ui { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; color: #fff; }
         .ui-hidden { opacity: 0; pointer-events: none; }
-        
-        .p-top { padding: 15px 30px; display: flex; align-items: center; gap: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
+        .p-top { padding: 20px 30px; display: flex; align-items: center; gap: 15px; }
         .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 60px; }
-        .p-bottom { padding: 10px 40px 30px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
-        .p-seekbar { width: 100%; accent-color: var(--primary); height: 4px; margin-bottom: 10px; }
+        .p-bottom { padding: 20px 40px; }
+        .p-seekbar { width: 100%; accent-color: var(--primary); height: 4px; }
 
-        /* NOTIFICATION INBOX */
-        #notif-page { display: none; padding: 15px; }
-        .notif-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #eee; border-left: 5px solid var(--primary); }
-        .notif-card h3 { margin: 0; font-size: 16px; color: #333; }
-        .notif-card p { margin: 5px 0; font-size: 14px; color: #666; }
-
-        /* BOTTOM NAV */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid var(--border); z-index: 2000; box-shadow: 0 -3px 10px rgba(0,0,0,0.05); }
-        .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: 900; }
         .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid var(--border); z-index: 2000; }
     </style>
 </head>
 <body>
@@ -89,20 +82,25 @@
 
     <div id="slider-container"></div>
     <div id="main-content"></div>
-    <div id="notif-page">
-        <h2 style="margin-left:15px; color:var(--primary);">Notification Inbox</h2>
-        <div id="notif-list"></div>
+
+    <!-- Episode Modal -->
+    <div id="ep-modal">
+        <div class="ep-header">
+            <i class="fa-solid fa-arrow-left" onclick="$('#ep-modal').fadeOut()" style="font-size:22px; margin-right:15px;"></i>
+            <h2 id="ep-title" style="margin:0; font-size:17px; color:var(--primary); flex:1;">Episodes</h2>
+        </div>
+        <div id="ep-desc" style="padding:15px; font-size:13px; color:#666;"></div>
+        <div id="ep-list-content" class="ep-list"></div>
     </div>
 
-    <!-- PLAYER OVERLAY -->
+    <!-- PLAYER -->
     <div id="player-overlay" onclick="togglePlayerUI()">
         <div id="gesture-box"><i class="fa-solid fa-volume-high"></i><span id="gesture-percent">100%</span></div>
         <video id="main-video" playsinline></video>
         <div class="player-ui">
             <div class="p-top">
                 <i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:24px;"></i>
-                <span id="p-title" style="font-weight:bold; flex:1;">Channel Name</span>
-                <i class="fa-solid fa-gear"></i>
+                <span id="p-title" style="font-weight:bold; flex:1;">Channel</span>
             </div>
             <div class="p-center">
                 <i class="fa-solid fa-rotate-left" onclick="event.stopPropagation(); video.currentTime -= 5"></i>
@@ -114,101 +112,107 @@
             </div>
             <div class="p-bottom">
                 <input type="range" class="p-seekbar" id="seekbar" min="0" max="100" value="0" oninput="event.stopPropagation(); manualSeek(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:5px; font-weight:bold;">
                     <span id="curr-time">00:00</span><span id="dur-time">LIVE</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
-        <div class="nav-item" onclick="loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
-        <div class="nav-item" onclick="loadTab('trending', this)"><i class="fa-solid fa-fire"></i>Trending</div>
+        <div class="nav-item" onclick="loadTV(this)"><i class="fa-solid fa-tv"></i>Live TV</div>
+        <div class="nav-item" onclick="loadTrending(this)"><i class="fa-solid fa-fire"></i>Trending</div>
         <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-trophy"></i>Missing</div>
     </div>
 
     <script>
-        const API = "https://wasitv.lovable.app/api/public";
+        const API = location.origin + "/api/public";
         const video = document.getElementById('main-video');
         let hls = new Hls({ lowLatencyMode: true });
-        let sliderInt;
+        let sliderInt, feedCache = null, moviesCache = null;
 
         const firebaseConfig = { databaseURL: "https://wasitv-63ff0-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. DATA LOADING LOGIC (Old Logic - Direct Fetch)
+        // 1. SMART FETCH (Caching Logic from your snippet)
+        const getFeed = () => feedCache || (feedCache = fetch(`${API}/feed`).then(r => r.json()));
+        const getMovies = () => moviesCache || (moviesCache = fetch(`${API}/movies`).then(r => r.json()));
+
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); $(el).addClass('active');
-            $('#main-content, #notif-page, #slider-container').hide();
+            $('#main-content, #slider-container').hide();
             
-            if(tab === 'notif') { $('#notif-page').show(); loadInbox(); return; }
-
-            $('#main-content').show().html('<div class="playlist-grid">' + Array(9).fill('<div class="skeleton"></div>').join('') + '</div>');
-
-            try {
-                if(tab === 'home') {
-                    const sData = await fetch(`${API}/slider`).then(r=>r.json());
-                    renderSlider(sData);
-                    const hData = await fetch(`${API}/sports`).then(r=>r.json());
-                    renderGrid(hData);
-                } else if(tab === 'tv') {
-                    const tData = await fetch(`${API}/feed`).then(r=>r.json());
-                    renderGrid(tData.channels);
-                } else if(tab === 'trending') {
-                    // FETCHING FROM MOVIES API FOR TRENDING SECTION
-                    const trData = await fetch(`${API}/movies`).then(r=>r.json());
-                    // Handling both array and nested item structure
-                    let items = trData.items || (Array.isArray(trData[0]?.items) ? trData[0].items : trData);
-                    renderGrid(items, true); 
-                } else if(tab === 'missing') {
-                    db.ref('missing_sports').once('value', s => renderGrid(Object.values(s.val() || {})));
-                }
-            } catch(e) { console.log("API Fetch Error"); }
-        }
-
-        function renderSlider(data) {
-            let html = '';
-            data.forEach((s, i) => {
-                html += `<div class="slide ${i===0?'active':''}" onclick="playStream('${s.slug}','${s.type}','${s.name}')"><img src="${s.image}"></div>`;
-            });
-            $('#slider-container').html(html).show();
-            startSlider();
-        }
-
-        function startSlider() {
-            clearInterval(sliderInt);
-            sliderInt = setInterval(() => {
-                let cur = $('.slide.active'), nxt = cur.next().length ? cur.next() : $('.slide').first();
-                cur.removeClass('active'); nxt.addClass('active');
-            }, 4000);
-        }
-
-        function renderGrid(items, isPortrait = false) {
-            let html = '<div class="playlist-grid">';
-            if(!items || items.length === 0) {
-                html = '<p style="text-align:center; width:100%; grid-column:1/span 3; padding:50px;">Check your connection...</p>';
-            } else {
-                items.forEach(i => {
-                    const n = i.name || i.channelName, img = i.image || i.logo, s = i.slug || i.channelSlug;
-                    const portraitClass = (isPortrait || i.type === 'movie' || i.type === 'program') ? 'portrait' : '';
-                    html += `<div class="card ${portraitClass}" onclick="playStream('${s}', '${i.type||'channel'}', '${n.replace(/'/g,"")}')">
-                        <img src="${img}" loading="lazy"><div class="card-title">${n}</div>
-                    </div>`;
-                });
+            if(tab === 'home') {
+                const feed = await getFeed();
+                renderSlider(feed.slider);
+                $('#main-content').show().html('');
+                renderSection('Live Free Sports', feed.sports);
+            } else if(tab === 'missing') {
+                $('#main-content').show().html('');
+                db.ref('missing_sports').once('value', s => renderSection('Missing Sports', Object.values(s.val() || {})));
+            } else if(tab === 'notif') {
+                $('#main-content').show().html('<div style="padding:20px;"><h2>Notifications</h2><div id="notif-list"></div></div>');
+                loadInbox();
             }
-            $('#main-content').html(html + '</div>');
         }
 
-        // 2. PLAYER & GESTURES LOGIC
+        async function loadTV(el) {
+            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('#slider-container').hide(); $('#main-content').show().html('');
+            const feed = await getFeed();
+            renderSection('All Live TV', feed.channels);
+        }
+
+        async function loadTrending(el) {
+            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('#slider-container').hide(); $('#main-content').show().html('');
+            const sections = await getMovies();
+            sections.forEach(sec => renderSection(sec.title, sec.items));
+        }
+
+        function renderSection(title, items) {
+            if(!items || items.length === 0) return;
+            let html = `<div class="section-title">${title}</div><div class="playlist-grid">`;
+            items.forEach(i => {
+                const portrait = (i.type !== 'channel') ? 'portrait' : '';
+                html += `<div class="card ${portrait}" onclick="handleClick('${i.slug}', '${i.type}', '${i.name || i.channelName}')">
+                    <img src="${i.image || i.logo}" loading="lazy">
+                    ${i.isFree === false ? '<span class="pro-badge">PRO</span>' : ''}
+                    <div class="card-title">${i.name || i.channelName}</div>
+                </div>`;
+            });
+            $('#main-content').append(html + '</div>');
+        }
+
+        // HANDLER FOR DRAMAS/EPISODES
+        function handleClick(slug, type, name) {
+            if (type === 'program' || type === 'series') loadEpisodes(slug, name);
+            else playStream(slug, type || 'channel', name);
+        }
+
+        async function loadEpisodes(slug, name) {
+            $('#ep-title').text(name);
+            $('#ep-list-content').html('<p style="text-align:center;">Loading Episodes...</p>');
+            $('#ep-modal').fadeIn();
+            try {
+                const data = await fetch(`${API}/program?slug=${encodeURIComponent(slug)}`).then(r => r.json());
+                $('#ep-desc').text(data.description || '');
+                let html = data.episodes.map(ep => `<div class="ep-item" onclick="playStream('${ep.slug}', 'episode', '${ep.name}')">
+                    <span>${ep.name} ${ep.isFree === false ? '<b style="color:red">(PRO)</b>' : ''}</span>
+                    <i class="fa-solid fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
+                </div>`).join('');
+                $('#ep-list-content').html(html || 'No episodes found.');
+            } catch (e) { $('#ep-list-content').html('Error loading episodes.'); }
+        }
+
+        // 2. PLAYER & GESTURES
         async function playStream(slug, type, name) {
+            $('#ep-modal').hide();
             $('#p-title').text(name);
             $('#player-overlay').show(); $('#btn-loader').show();
-            
             let url = slug.startsWith('http') ? slug : (await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json())).url;
-
             if (Hls.isSupported()) {
                 hls.destroy(); hls = new Hls();
                 hls.loadSource(url); hls.attachMedia(video);
@@ -216,23 +220,16 @@
             } else { video.src = url; video.play(); }
         }
 
-        function togglePlayerUI() { $('.player-ui').toggleClass('ui-hidden'); }
-
-        // Volume Swipe (Right/Any side for volume)
+        // Gesture Volume
         let startY, startVol;
-        document.getElementById('player-overlay').addEventListener('touchstart', e => { 
-            startY = e.touches[0].pageY; 
-            startVol = video.volume; 
-        });
+        document.getElementById('player-overlay').addEventListener('touchstart', e => { startY = e.touches[0].pageY; startVol = video.volume; });
         document.getElementById('player-overlay').addEventListener('touchmove', e => {
-            const diff = (startY - e.touches[0].pageY) / 200;
-            let v = Math.min(1, Math.max(0, startVol + diff));
+            const v = Math.min(1, Math.max(0, startVol + (startY - e.touches[0].pageY) / 200));
             video.volume = v;
             $('#gesture-box').css('display', 'flex').find('#gesture-percent').text(Math.round(v * 100) + "%");
         });
         document.getElementById('player-overlay').addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
 
-        // Player Events
         video.onplaying = () => { $('#btn-loader').hide(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); };
         video.onwaiting = () => { $('#btn-loader').show(); };
         video.ontimeupdate = () => {
@@ -241,29 +238,37 @@
             $('#curr-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
 
+        function togglePlayerUI() { $('.player-ui').toggleClass('ui-hidden'); }
         function togglePlay() { video.paused ? video.play() : video.pause(); }
         function closePlayer() { video.pause(); $('#player-overlay').hide(); }
         function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
 
-        // 3. INBOX & BADGE LOGIC
-        function loadInbox() {
-            db.ref('app_notifications').on('value', s => {
-                let html = '';
-                if(s.val()) Object.values(s.val()).reverse().forEach(n => {
-                    html += `<div class="notif-card"><h3>${n.title}</h3><p>${n.message}</p></div>`;
-                });
-                $('#notif-list').html(html || 'No Messages');
-                $('#notif-badge').hide(); // Reset badge
-            });
+        function renderSlider(data) {
+            if(!data) return;
+            let html = data.map((s, i) => `<div class="slide ${i===0?'active':''}" onclick="handleClick('${s.slug}','${s.type}','${s.name}')"><img src="${s.image}"></div>`).join('');
+            $('#slider-container').html(html).show();
+            clearInterval(sliderInt);
+            sliderInt = setInterval(() => {
+                let cur = $('.slide.active'), nxt = cur.next().length ? cur.next() : $('.slide').first();
+                cur.removeClass('active'); nxt.addClass('active');
+            }, 4000);
         }
 
-        // Live Badge Listener
-        db.ref('app_notifications').on('child_added', (snapshot) => {
-            if ($('#notif-page').is(':hidden')) {
-                let current = parseInt($('#notif-badge').text()) || 0;
-                $('#notif-badge').text(current + 1).css('display', 'flex');
-            }
+        // Notification Badge Logic
+        db.ref('app_notifications').on('value', s => {
+            const count = Object.keys(s.val() || {}).length;
+            const seen = localStorage.getItem('seen_notif') || 0;
+            if(count > seen) $('#notif-badge').text(count - seen).show();
         });
+
+        function loadInbox() {
+            db.ref('app_notifications').once('value', s => {
+                localStorage.setItem('seen_notif', Object.keys(s.val() || {}).length);
+                $('#notif-badge').hide();
+                let html = Object.values(s.val() || {}).reverse().map(n => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; margin-bottom:10px; border-left:5px solid orange;"><h3>${n.title}</h3><p>${n.message}</p></div>`).join('');
+                $('#notif-list').html(html || 'No messages');
+            });
+        }
 
         $(document).ready(() => loadTab('home', $('.nav-item').first()));
     </script>
