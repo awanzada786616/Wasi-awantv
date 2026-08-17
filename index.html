@@ -11,19 +11,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — Pro Ultimate</title>
+    <title>Wasi TV — White Pro Ultimate</title>
 
     <style>
         :root { --primary: #ff9800; --bg: #ffffff; --border: #eeeeee; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: #000; padding-bottom: 80px; overflow-x: hidden; }
 
-        header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        /* HEADER */
+        header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
         /* NOTIFICATION BADGE */
         .notif-btn { position: relative; cursor: pointer; color: var(--primary); font-size: 22px; padding: 5px; }
-        #notif-badge { position: absolute; top: 0; right: 0; background: red; color: #fff; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
+        #notif-badge { position: absolute; top: 0; right: 0; background: red; color: #fff; font-size: 10px; font-weight: bold; width: 17px; height: 17px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
 
         /* SLIDER */
         #slider-container { width: 94%; aspect-ratio: 16/8; margin: 10px auto; border-radius: 12px; overflow: hidden; position: relative; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -31,44 +32,46 @@
         .slide.active { opacity: 1; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* CONTENT GRID */
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+        /* GRID & CARDS */
+        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
         .card { background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.03); cursor: pointer; }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 10px; }
-        .card-title { font-size: 10px; font-weight: 700; color: #333; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card.portrait img { aspect-ratio: 2/3; object-fit: cover; padding: 0; }
+        .card-title { font-size: 10px; font-weight: 700; color: #333; padding: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* SKELETON LOADING */
+        /* SKELETON */
         .skeleton { background: #f5f5f5; border-radius: 10px; height: 110px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
 
-        /* --- PLAYER OVERLAY (SCREENSHOT STYLE) --- */
+        /* --- PRO PLAYER (SCREENSHOT STYLE) --- */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; touch-action: none; }
         #main-video { width: 100%; height: 100%; object-fit: contain; }
         
         #gesture-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 50%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; border: 2px solid var(--primary); color: #fff; }
 
+        /* CENTER BUTTON WITH BORDER SPINNER */
         .play-wrapper { position: relative; width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; }
-        #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; }
+        #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
         #btn-loader { position: absolute; inset: 0; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .player-ui { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; transition: 0.3s; color: #fff; }
         .ui-hidden { opacity: 0; pointer-events: none; }
         
-        .p-top { padding: 15px 30px; display: flex; align-items: center; gap: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); }
+        .p-top { padding: 15px 30px; display: flex; align-items: center; gap: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent); }
         .p-center { flex: 1; display: flex; justify-content: center; align-items: center; gap: 60px; }
-        .p-bottom { padding: 10px 40px 30px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
+        .p-bottom { padding: 10px 40px 30px; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
         .p-seekbar { width: 100%; accent-color: var(--primary); height: 4px; margin-bottom: 10px; }
 
-        /* INBOX / NOTIF */
+        /* NOTIFICATION INBOX */
         #notif-page { display: none; padding: 15px; }
-        .notif-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--primary); border: 1px solid #eee; }
+        .notif-card { background: #f9f9f9; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #eee; border-left: 5px solid var(--primary); }
         .notif-card h3 { margin: 0; font-size: 16px; color: #333; }
         .notif-card p { margin: 5px 0; font-size: 14px; color: #666; }
 
-        /* NAV */
+        /* BOTTOM NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; display: flex; padding: 10px 0; border-top: 1px solid var(--border); z-index: 2000; box-shadow: 0 -3px 10px rgba(0,0,0,0.05); }
-        .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: 900; }
+        .nav-item { color: #999; text-align: center; flex: 1; font-size: 10px; font-weight: 900; cursor: pointer; }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 4px; }
     </style>
@@ -91,7 +94,7 @@
         <div id="notif-list"></div>
     </div>
 
-    <!-- PLAYER -->
+    <!-- PLAYER OVERLAY -->
     <div id="player-overlay" onclick="togglePlayerUI()">
         <div id="gesture-box"><i class="fa-solid fa-volume-high"></i><span id="gesture-percent">100%</span></div>
         <video id="main-video" playsinline></video>
@@ -136,7 +139,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. CONTENT LOADING
+        // 1. DATA LOADING LOGIC (Old Logic - Direct Fetch)
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); $(el).addClass('active');
             $('#main-content, #notif-page, #slider-container').hide();
@@ -155,12 +158,15 @@
                     const tData = await fetch(`${API}/feed`).then(r=>r.json());
                     renderGrid(tData.channels);
                 } else if(tab === 'trending') {
+                    // FETCHING FROM MOVIES API FOR TRENDING SECTION
                     const trData = await fetch(`${API}/movies`).then(r=>r.json());
-                    renderGrid(trData[0]?.items || trData); // Trending endpoint fix
+                    // Handling both array and nested item structure
+                    let items = trData.items || (Array.isArray(trData[0]?.items) ? trData[0].items : trData);
+                    renderGrid(items, true); 
                 } else if(tab === 'missing') {
                     db.ref('missing_sports').once('value', s => renderGrid(Object.values(s.val() || {})));
                 }
-            } catch(e) { console.log("API Error"); }
+            } catch(e) { console.log("API Fetch Error"); }
         }
 
         function renderSlider(data) {
@@ -180,23 +186,29 @@
             }, 4000);
         }
 
-        function renderGrid(items) {
+        function renderGrid(items, isPortrait = false) {
             let html = '<div class="playlist-grid">';
-            if(!items || items.length === 0) { html = '<p style="text-align:center; width:100%; grid-column: 1 / span 3; padding:50px;">Empty Content</p>'; }
-            else {
+            if(!items || items.length === 0) {
+                html = '<p style="text-align:center; width:100%; grid-column:1/span 3; padding:50px;">Check your connection...</p>';
+            } else {
                 items.forEach(i => {
                     const n = i.name || i.channelName, img = i.image || i.logo, s = i.slug || i.channelSlug;
-                    html += `<div class="card" onclick="playStream('${s}', '${i.type||'channel'}', '${n.replace(/'/g,"")}')"><img src="${img}"><div class="card-title">${n}</div></div>`;
+                    const portraitClass = (isPortrait || i.type === 'movie' || i.type === 'program') ? 'portrait' : '';
+                    html += `<div class="card ${portraitClass}" onclick="playStream('${s}', '${i.type||'channel'}', '${n.replace(/'/g,"")}')">
+                        <img src="${img}" loading="lazy"><div class="card-title">${n}</div>
+                    </div>`;
                 });
             }
             $('#main-content').html(html + '</div>');
         }
 
-        // 2. PLAYER & GESTURES
+        // 2. PLAYER & GESTURES LOGIC
         async function playStream(slug, type, name) {
             $('#p-title').text(name);
             $('#player-overlay').show(); $('#btn-loader').show();
+            
             let url = slug.startsWith('http') ? slug : (await fetch(`${API}/stream?slug=${slug}&type=${type}`).then(r=>r.json())).url;
+
             if (Hls.isSupported()) {
                 hls.destroy(); hls = new Hls();
                 hls.loadSource(url); hls.attachMedia(video);
@@ -206,9 +218,12 @@
 
         function togglePlayerUI() { $('.player-ui').toggleClass('ui-hidden'); }
 
-        // Swipe Volume
+        // Volume Swipe (Right/Any side for volume)
         let startY, startVol;
-        document.getElementById('player-overlay').addEventListener('touchstart', e => { startY = e.touches[0].pageY; startVol = video.volume; });
+        document.getElementById('player-overlay').addEventListener('touchstart', e => { 
+            startY = e.touches[0].pageY; 
+            startVol = video.volume; 
+        });
         document.getElementById('player-overlay').addEventListener('touchmove', e => {
             const diff = (startY - e.touches[0].pageY) / 200;
             let v = Math.min(1, Math.max(0, startVol + diff));
@@ -217,6 +232,7 @@
         });
         document.getElementById('player-overlay').addEventListener('touchend', () => setTimeout(() => $('#gesture-box').hide(), 500));
 
+        // Player Events
         video.onplaying = () => { $('#btn-loader').hide(); $('#pp-btn').attr('class', 'fa-solid fa-circle-pause'); };
         video.onwaiting = () => { $('#btn-loader').show(); };
         video.ontimeupdate = () => {
@@ -229,7 +245,7 @@
         function closePlayer() { video.pause(); $('#player-overlay').hide(); }
         function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
 
-        // 3. INBOX & BADGE
+        // 3. INBOX & BADGE LOGIC
         function loadInbox() {
             db.ref('app_notifications').on('value', s => {
                 let html = '';
@@ -237,10 +253,11 @@
                     html += `<div class="notif-card"><h3>${n.title}</h3><p>${n.message}</p></div>`;
                 });
                 $('#notif-list').html(html || 'No Messages');
-                $('#notif-badge').hide();
+                $('#notif-badge').hide(); // Reset badge
             });
         }
 
+        // Live Badge Listener
         db.ref('app_notifications').on('child_added', (snapshot) => {
             if ($('#notif-page').is(':hidden')) {
                 let current = parseInt($('#notif-badge').text()) || 0;
