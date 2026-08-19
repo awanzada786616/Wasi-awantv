@@ -8,84 +8,85 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <title>Wasi TV Pro</title>
 
     <style>
-        :root { --primary: #ff9800; --bg: #000000; --card-bg: #121212; --border: #1f1f1f; --text: #ffffff; }
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; text-decoration: none !important; }
+        :root { --primary: #ff4747; --bg: #1a1a1a; --text: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; text-decoration: none; }
+        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 100px; }
+
+        /* JAZZ TV STYLE HEADER */
+        header { padding: 15px; text-align: center; background: #1a1a1a; position: sticky; top: 0; z-index: 1000; }
+        .pill-title { background: var(--primary); color: #fff; padding: 5px 25px; border-radius: 20px; font-weight: bold; font-size: 18px; display: inline-block; box-shadow: 0 4px 10px rgba(255, 71, 71, 0.4); }
+
+        /* GRID LIKE SCREENSHOT */
+        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px; }
+        .card { background: #fff; border-radius: 12px; overflow: hidden; text-align: center; border: 1px solid #333; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
         
-        body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
+        /* MOVING TEXT (MARQUEE) */
+        .card-info { background: #fff; padding: 8px 5px; overflow: hidden; white-space: nowrap; position: relative; }
+        .card-title { display: inline-block; font-size: 11px; font-weight: bold; color: #000; min-width: 100%; animation: marquee 5s linear infinite; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        header { padding: 15px; text-align: center; background: #000; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        header h1 { color: var(--primary); font-size: 22px; margin: 0; font-weight: 800; }
+        /* SECTION TITLES */
+        .section-title { padding: 10px 15px 0; font-size: 12px; font-weight: bold; color: #888; text-transform: uppercase; }
 
-        .notif-btn { position: relative; color: var(--primary); font-size: 22px; }
-        #notif-badge { position: absolute; top: -5px; right: -5px; background: #ff3b30; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #000; }
-
-        #slider-container { width: 94%; aspect-ratio: 16/9; margin: 15px auto; border-radius: 15px; overflow: hidden; display: none; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
-
-        .section-title { padding: 20px 15px 5px; font-size: 13px; font-weight: 600; color: #666; text-transform: uppercase; }
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; text-align: center; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 10px; display: block; margin: 0 auto; }
-        .card-title { font-size: 10px; font-weight: 600; color: #eee; padding: 8px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* --- PLAYER STYLING --- */
+        /* IMPROVED PLAYER UI */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; }
-        #main-video { width: 100%; height: 100%; object-fit: contain; }
-        .player-controls { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.3s; }
+        #main-video { width: 100%; height: 100%; }
+        .player-controls { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; opacity: 1; transition: 0.3s; }
         .ui-hidden { opacity: 0; pointer-events: none; }
 
-        /* --- FOOTER --- */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; display: flex; padding: 12px 0; border-top: 1px solid var(--border); z-index: 2000; }
-        .nav-item { color: #444; text-align: center; flex: 1; font-size: 10px; font-weight: 600; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
-        .nav-item i { font-size: 18px; }
-        .nav-item.active { color: var(--primary); }
+        /* SPINNER */
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .notif-card { background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
+        /* FOOTER LIKE SCREENSHOT */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; padding: 10px 0; border-top: 1px solid #333; z-index: 2000; }
+        .nav-item { color: #fff; text-align: center; flex: 1; font-size: 11px; font-weight: bold; display: flex; flex-direction: column; gap: 5px; cursor: pointer; transition: 0.3s; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active i { background: #f07d3a; color: #fff; padding: 8px 25px; border-radius: 25px; margin-top: -5px; }
+
+        .notif-card { background: #222; padding: 15px; border-radius: 10px; margin: 10px; border-left: 5px solid var(--primary); }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="width: 40px;"></div>
-        <h1>WASI TV</h1>
-        <div class="notif-btn" onclick="goToHash('#notif'); loadTab('notif', this)">
-            <i class="fa-solid fa-bell"></i>
-            <span id="notif-badge">0</span>
-        </div>
+        <div class="pill-title">Wasi TV</div>
     </header>
 
-    <div id="slider-container"></div>
     <div id="main-content"></div>
 
     <!-- PLAYER OVERLAY -->
     <div id="player-overlay" onclick="toggleUI()">
+        <div id="loader"></div>
         <video id="main-video" playsinline></video>
         <div class="player-controls" id="p-ui">
-            <div style="display:flex; align-items:center; gap:15px;">
-                <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:25px;"></i>
-                <span id="p-title" style="font-weight:bold; font-size:16px;">Loading...</span>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:25px; color:#fff;"></i>
+                <span id="p-title" style="font-weight:bold; font-size:18px;">Wasi TV Live</span>
             </div>
             <div style="align-self:center;">
-                <i class="fa-solid fa-play" id="play-btn" style="font-size:50px; color:var(--primary);" onclick="event.stopPropagation(); togglePlay()"></i>
+                <i class="fa-solid fa-play" id="play-btn" style="font-size:60px; color:var(--primary);" onclick="event.stopPropagation(); togglePlay()"></i>
             </div>
-            <div style="text-align:right;">
-                 <i class="fa-solid fa-expand" onclick="event.stopPropagation(); goFull()" style="font-size:20px; color:#888;"></i>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="dur">LIVE</span>
+                <i class="fa-solid fa-expand" onclick="event.stopPropagation(); goFull()" style="font-size:20px;"></i>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- FOOTER (SCREENSHOT STYLE) -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="goToHash('#home'); loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
-        <div class="nav-item" onclick="goToHash('#tv'); loadTV(this)"><i class="fa-solid fa-tv"></i>TV</div>
-        <div class="nav-item" onclick="goToHash('#trending'); loadTrending(this)"><i class="fa-solid fa-fire"></i>Trending</div>
-        <div class="nav-item" onclick="goToHash('#missing'); loadTab('missing', this)"><i class="fa-solid fa-circle-question"></i>Missing</div>
+        <div class="nav-item" onclick="goToHash('#home'); loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
+        <div class="nav-item active" onclick="goToHash('#tv'); loadTV(this)"><i class="fa-solid fa-tv"></i>Live TV</div>
+        <div class="nav-item" onclick="goToHash('#movies'); loadMovies(this)"><i class="fa-solid fa-clapperboard"></i>Movies</div>
     </div>
 
     <script>
@@ -100,116 +101,89 @@
 
         window.onpopstate = function() {
             const h = window.location.hash;
-            if (h === "" || h === "#home") { closePlayer(); loadTab('home', $('.nav-item').first()); }
+            if (h === "" || h === "#home") { closePlayer(); loadTab('home'); }
             else if (h === "#tv") loadTV();
-            else if (h === "#trending") loadTrending();
-            else if (h === "#missing") loadTab('missing');
-            else if (h === "#notif") loadTab('notif');
+            else if (h === "#movies") loadMovies();
         };
 
         async function loadTab(tab, el) {
-            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
-            $('#main-content, #slider-container').hide();
-            if(tab === 'home') {
-                const r = await fetch(`${API}/feed`).then(r=>r.json());
-                renderSlider(r.slider); $('#main-content').show().html('');
-                renderSection('Live Sports', r.sports);
-            } else if(tab === 'missing') {
-                $('#main-content').show().html('<div class="section-title">Missing Sports</div><div id="missing-list" class="playlist-grid"></div>');
-                db.ref('missing_sports').once('value', s => renderSectionIn('missing-list', Object.values(s.val() || {})));
-            } else if(tab === 'notif') {
-                $('#main-content').show().html('<div style="padding:15px;"><div class="section-title">Inbox</div><div id="notif-list"></div></div>');
-                loadInbox();
-            }
+            updateNav(el);
+            $('#main-content').html('<div class="section-title">Home Section</div>');
+            const r = await fetch(`${API}/feed`).then(r=>r.json());
+            renderSection('Live Free Sports', r.sports);
+            // Missing Section
+            db.ref('missing_sports').once('value', s => {
+                $('#main-content').append('<div class="section-title">Missing Sports</div><div id="missing-grid" class="playlist-grid"></div>');
+                renderIn('missing-grid', Object.values(s.val() || {}));
+            });
         }
 
         async function loadTV(el) {
-            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
-            $('#slider-container, #main-content').hide();
+            updateNav(el);
+            $('#main-content').html('<div class="section-title">All Channels</div>');
             const r = await fetch(`${API}/feed`).then(r=>r.json());
-            $('#main-content').show().html(''); renderSection('Live Channels', r.channels);
+            renderSection('Live TV', r.channels);
         }
 
-        async function loadTrending(el) {
-            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
-            $('#slider-container, #main-content').hide();
+        async function loadMovies(el) {
+            updateNav(el);
+            $('#main-content').html('<div class="section-title">Trending Movies</div>');
             const r = await fetch(`${API}/movies`).then(r=>r.json());
-            $('#main-content').show().html('');
             r.forEach(sec => renderSection(sec.title, sec.items));
+        }
+
+        function updateNav(el) {
+            if(!el) return;
+            $('.nav-item').removeClass('active');
+            $(el).addClass('active');
         }
 
         function renderSection(title, items) {
             if(!items) return;
             let html = `<div class="section-title">${title}</div><div class="playlist-grid">`;
             items.forEach(i => {
-                const name = i.name || i.channelName || "Unknown";
-                const img = i.image || i.logo || "";
+                const name = i.name || i.channelName || "Wasi TV";
+                const img = i.image || i.logo;
                 html += `<div class="card" onclick="playStream('${i.slug}','${i.type||'channel'}','${name}')">
                     <img src="${img}" loading="lazy">
-                    <div class="card-title">${name}</div>
+                    <div class="card-info"><div class="card-title">${name}</div></div>
                 </div>`;
             });
             $('#main-content').append(html + '</div>');
         }
 
-        function renderSectionIn(divId, items) {
+        function renderIn(id, items) {
             let html = '';
             items.forEach(i => {
-                const name = i.channelName || i.name || "Unknown";
-                const img = i.logo || i.image || "";
+                const name = i.channelName || i.name;
                 html += `<div class="card" onclick="playStream('${i.slug}','channel','${name}')">
-                    <img src="${img}" loading="lazy">
-                    <div class="card-title">${name}</div>
+                    <img src="${i.logo}" loading="lazy">
+                    <div class="card-info"><div class="card-title">${name}</div></div>
                 </div>`;
             });
-            $('#' + divId).html(html);
+            $('#' + id).html(html);
         }
 
         function playStream(slug, type, name) {
             goToHash('#player');
-            // --- ROTATION SIGNAL ---
             if(window.Android) window.Android.rotateLandscape();
-            
             $('#p-title').text(name);
             $('#player-overlay').show();
+            $('#loader').show();
             let url = slug.startsWith('http') ? slug : API + "/stream?slug=" + slug + "&type=" + type;
             if (Hls.isSupported()) { hls.destroy(); hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
             else { video.src = url; video.play(); }
         }
 
-        function closePlayer() { 
-            video.pause(); $('#player-overlay').hide(); 
-            if(window.Android) window.Android.rotatePortrait(); 
-        }
-
+        function closePlayer() { video.pause(); $('#player-overlay').hide(); if(window.Android) window.Android.rotatePortrait(); }
         function togglePlay() { video.paused ? video.play() : video.pause(); }
         function toggleUI() { $('#p-ui').toggleClass('ui-hidden'); }
-        video.onplaying = () => { $('#play-btn').attr('class', 'fa-solid fa-pause'); };
-        video.onpause = () => { $('#play-btn').attr('class', 'fa-solid fa-play'); };
+        
+        video.onwaiting = () => $('#loader').show();
+        video.onplaying = () => { $('#loader').hide(); $('#play-btn').attr('class', 'fa-solid fa-pause'); };
+        video.onpause = () => $('#play-btn').attr('class', 'fa-solid fa-play');
 
-        function loadInbox() {
-            db.ref('app_notifications').once('value', s => {
-                localStorage.setItem('seen_notif', Object.keys(s.val() || {}).length);
-                $('#notif-badge').hide();
-                let html = Object.values(s.val() || {}).reverse().map(n => `<div class="notif-card"><h3>${n.title}</h3><p>${n.message}</p></div>`).join('');
-                $('#notif-list').html(html || '<p style="color:#555">No messages</p>');
-            });
-        }
-
-        db.ref('app_notifications').on('value', s => {
-            const count = Object.keys(s.val() || {}).length;
-            const seen = localStorage.getItem('seen_notif') || 0;
-            if(count > seen) $('#notif-badge').text(count - seen).css('display','flex');
-        });
-
-        function renderSlider(data) {
-            if(!data) return;
-            let html = data.map((s,i) => `<div class="slide ${i===0?'active':''}" onclick="playStream('${s.slug}','${s.type}','${s.name}')"><img src="${s.image}"></div>`).join('');
-            $('#slider-container').html(html).show();
-            setInterval(() => { let cur = $('.slide.active'), nxt = cur.next().length ? cur.next() : $('.slide').first(); cur.removeClass('active'); nxt.addClass('active'); }, 4000);
-        }
-
-        $(document).ready(() => { history.replaceState(null, '', '#home'); loadTab('home', $('.nav-item').first()); });
+        $(document).ready(() => loadTV($('.nav-item')[1]));
     </script>
 </body>
 </html>
