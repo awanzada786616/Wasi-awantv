@@ -19,7 +19,7 @@
         
         body { margin: 0; background: #121212; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
 
-        /* HEADER */
+        /* HEADER JAZZ STYLE */
         header { padding: 15px; background: #000; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .pill-logo { background: #d32f2f; color: #fff; padding: 4px 35px; border-radius: 20px; font-weight: 900; font-size: 18px; }
         .notif-icon { position: absolute; right: 20px; font-size: 22px; color: #fff; cursor: pointer; }
@@ -29,14 +29,14 @@
         .skeleton { background: #222; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 10px; }
         @keyframes loading { to { background-position: -200% 0; } }
 
-        /* GRID */
+        /* CONTENT GRID */
         .section-title { padding: 15px 15px 5px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
         
         /* JAZZ TV CARDS WITH MARQUEE */
         .card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #fff; padding: 10px; }
-        .card-info { background: #fff; padding: 6px 0; overflow: hidden; border-top: 1px solid #eee; position: relative; }
+        .card-info { background: #fff; padding: 6px 0; overflow: hidden; border-top: 1px solid #eee; }
         
         .marquee-box { white-space: nowrap; display: inline-block; padding-left: 100%; animation: slow-move 10s linear infinite; font-size: 10px; font-weight: 900; color: #000; text-transform: uppercase; }
         @keyframes slow-move { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
@@ -45,23 +45,24 @@
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; }
         #main-video { width: 100%; height: 100%; object-fit: contain; }
 
-        .p-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.3s; z-index: 10002; }
+        .p-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.4s ease; z-index: 10002; }
         .ui-hide { opacity: 0; pointer-events: none; }
 
         /* CENTER CONTROLS WITH SPINNER */
-        .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 50px; z-index: 10005; }
+        .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 50px; z-index: 10005; pointer-events: none; }
+        .p-center i, .play-wrapper { pointer-events: auto; }
         
         .play-wrapper { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
-        .white-spinner { position: absolute; width: 80px; height: 80px; border: 4px solid transparent; border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        .white-spinner { position: absolute; width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .play-btn-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 25px; cursor: pointer; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .play-btn-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 25px; cursor: pointer; box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index: 10; }
 
-        .p-top { display: flex; align-items: center; justify-content: space-between; }
-        .p-bottom { width: 100%; }
+        .p-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10006; }
+        .p-bottom { width: 100%; position: relative; z-index: 10006; }
         .seekbar { width: 100%; accent-color: var(--primary); height: 4px; cursor: pointer; }
 
-        /* NAVIGATION & FAB */
+        /* FOOTER & NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; padding: 10px 0; border-top: 1px solid #222; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item.active { color: #fff; }
@@ -85,45 +86,48 @@
     <a href="https://wa.me/923342002756" class="wa-btn"><i class="fa-brands fa-whatsapp"></i></a>
 
     <!-- PLAYER OVERLAY -->
-    <div id="player-overlay">
-        <video id="main-video" playsinline onclick="handleScreenTouch()"></video>
+    <div id="player-overlay" onclick="togglePlayerUI()">
+        <video id="main-video" playsinline></video>
 
         <div class="p-ui" id="p-controls">
-            <div class="p-top">
+            <!-- Top Controls -->
+            <div class="p-top" onclick="event.stopPropagation()">
                 <div style="display:flex; align-items:center; gap:15px;">
                     <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
-                    <span id="v-title" style="font-weight:700;">Wasi TV</span>
+                    <span id="v-title" style="font-weight:700; font-size:15px;">Wasi TV Live</span>
                 </div>
-                <div style="display:flex; gap:20px;">
+                <div style="display:flex; gap:22px; font-size:18px;">
                     <i class="fa-solid fa-chromecast"></i>
                     <i class="fa-solid fa-lock-open" id="lock-icon" onclick="toggleLock(event)"></i>
                 </div>
             </div>
 
+            <!-- Center Controls -->
             <div class="p-center" id="ctrl-center">
-                <i class="fa-solid fa-backward-step" onclick="video.currentTime -= 10"></i>
+                <i class="fa-solid fa-backward-step" onclick="event.stopPropagation(); video.currentTime -= 10"></i>
                 
-                <div class="play-wrapper">
+                <div class="play-wrapper" onclick="event.stopPropagation()">
                     <div class="white-spinner" id="p-loader"></div>
                     <div class="play-btn-circle" onclick="togglePlay()">
                         <i class="fa-solid fa-play" id="play-icon"></i>
                     </div>
                 </div>
 
-                <i class="fa-solid fa-forward-step" onclick="video.currentTime += 10"></i>
+                <i class="fa-solid fa-forward-step" onclick="event.stopPropagation(); video.currentTime += 10"></i>
             </div>
 
-            <div class="p-bottom" id="ctrl-bottom">
+            <!-- Bottom Controls -->
+            <div class="p-bottom" id="ctrl-bottom" onclick="event.stopPropagation()">
                 <input type="range" class="seekbar" id="seekbar" value="0" step="0.1" oninput="manualSeek(this.value)">
                 <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;">
                     <span id="c-time">00:00</span>
-                    <span style="color:red; font-weight:900;">LIVE</span>
+                    <span style="color:#ff4444; font-weight:900;"><i class="fa-solid fa-circle" style="font-size:8px; vertical-align:middle;"></i> LIVE</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- FOOTER NAV -->
     <div class="bottom-nav">
         <div class="nav-item" onclick="goToHash('#home'); loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item active" onclick="goToHash('#tv'); loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
@@ -142,13 +146,18 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- BACK NAVIGATION LOGIC ---
+        // --- NAVIGATION & ROUTING ---
         function goToHash(h) { history.pushState(null, '', h); }
 
         window.onpopstate = function() {
             const h = window.location.hash;
-            if (h === "#player") { /* Stay */ }
-            else { closePlayerUI(); handleRouting(h); }
+            if (h === "#player") { /* Do nothing */ }
+            else { 
+                $('#player-overlay').fadeOut(); 
+                video.pause();
+                if(window.Android) window.Android.rotatePortrait();
+                handleRouting(h); 
+            }
         };
 
         function handleRouting(h) {
@@ -159,7 +168,7 @@
             else loadTab('tv', $('.nav-item')[1]);
         }
 
-        // --- CONTENT LOADING ---
+        // --- UI LOADING ---
         async function loadTab(tab, el) {
             if(el) { $('.nav-item').removeClass('active'); $(el).addClass('active'); }
             $('#app-content').html('<div class="grid">' + '<div class="skeleton" style="aspect-ratio:1/1.2;"></div>'.repeat(9) + '</div>');
@@ -168,7 +177,7 @@
                 const r = await fetch(`${API}/feed`).then(r => r.json());
                 render(tab === 'tv' ? 'Channels' : 'Featured', tab === 'tv' ? r.channels : r.sports);
             } else if (tab === 'missing') {
-                db.ref('missing_sports').once('value', s => render('Missing', Object.values(s.val() || {})));
+                db.ref('missing_sports').once('value', s => render('Missing Channels', Object.values(s.val() || {})));
             } else if (tab === 'movies') {
                 const r = await fetch(`${API}/movies`).then(r => r.json());
                 let h = ''; r.forEach(s => {
@@ -187,7 +196,7 @@
             const img = i.logo || i.image || "https://via.placeholder.com/150";
             return `<div class="card" onclick="playStream('${i.slug}','${name}')">
                 <img src="${img}" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="card-info"><div class="marquee-box">${name} &nbsp; • &nbsp; ${name}</div></div>
+                <div class="card-info"><div class="marquee-box">${name} &nbsp; • &nbsp; ${name} &nbsp; • &nbsp; ${name}</div></div>
             </div>`;
         }
 
@@ -197,7 +206,7 @@
             $('#app-content').html(h + '</div>');
         }
 
-        // --- PLAYER CONTROLS ---
+        // --- PLAYER LOGIC ---
         function playStream(slug, name) {
             goToHash('#player');
             $('#v-title').text(name);
@@ -214,16 +223,29 @@
             showControls();
         }
 
-        function closePlayerUI() {
-            video.pause();
-            $('#player-overlay').fadeOut();
-            if(window.Android) window.Android.rotatePortrait();
+        function togglePlayerUI() {
+            if ($('#p-controls').hasClass('ui-hide')) {
+                showControls();
+            } else {
+                hideControls();
+            }
         }
 
-        function togglePlay() { 
+        function showControls() {
+            $('#p-controls').removeClass('ui-hide');
+            clearTimeout(uiTimeout);
+            if (!isLocked) uiTimeout = setTimeout(hideControls, 4000);
+            else uiTimeout = setTimeout(hideControls, 2000); // Hide lock faster
+        }
+
+        function hideControls() {
+            $('#p-controls').addClass('ui-hide');
+        }
+
+        function togglePlay() {
             if(isLocked) return;
-            video.paused ? video.play() : video.pause(); 
-            resetTimer(); 
+            video.paused ? video.play() : video.pause();
+            showControls();
         }
 
         function toggleLock(e) {
@@ -231,34 +253,24 @@
             isLocked = !isLocked;
             if(isLocked) {
                 $('#lock-icon').attr('class', 'fa-solid fa-lock');
-                $('#ctrl-center, #ctrl-bottom').fadeOut();
+                $('#ctrl-center, #ctrl-bottom').fadeOut(200);
             } else {
                 $('#lock-icon').attr('class', 'fa-solid fa-lock-open');
-                $('#ctrl-center, #ctrl-bottom').fadeIn();
-                resetTimer();
+                $('#ctrl-center, #ctrl-bottom').fadeIn(200);
             }
+            showControls();
         }
 
-        function handleScreenTouch() {
-            if(isLocked) {
-                $('#p-controls').removeClass('ui-hide');
-                resetTimer();
-                return;
-            }
-            if ($('#p-controls').hasClass('ui-hide')) showControls();
-            else hideControls();
+        function manualSeek(v) {
+            video.currentTime = (v / 100) * video.duration;
+            showControls();
         }
-
-        function showControls() { $('#p-controls').removeClass('ui-hide'); resetTimer(); }
-        function hideControls() { $('#p-controls').addClass('ui-hide'); }
-        function resetTimer() { clearTimeout(uiTimeout); uiTimeout = setTimeout(hideControls, 4000); }
-        function manualSeek(v) { if(!isLocked) video.currentTime = (v / 100) * video.duration; }
 
         video.onwaiting = () => $('#p-loader').show();
         video.onplaying = () => { 
             $('#p-loader').hide(); 
             $('#play-icon').attr('class', 'fa-solid fa-pause');
-            resetTimer();
+            uiTimeout = setTimeout(hideControls, 3000);
         };
         video.onpause = () => {
             $('#play-icon').attr('class', 'fa-solid fa-play');
@@ -270,6 +282,7 @@
             $('#c-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
 
+        // NOTIFICATIONS
         function loadNotifications() {
             db.ref('app_notifications').once('value', s => {
                 const data = s.val() || {};
