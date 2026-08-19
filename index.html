@@ -127,6 +127,16 @@
     </div>
 
     <script>
+        // Jab bhi user kisi channel par click kare, ye line chale:
+window.history.pushState({page: "player"}, "player", window.location.href);
+
+// Ye code check karega ke jab back dabaya jaye toh kya karna hai
+window.onpopstate = function(event) {
+    // Agar user player se back jana chahta hai
+    if (window.location.hash === "#back") {
+        window.location.href = "/"; // Dashboard ka link
+    }
+};
         const API = location.origin + "/api/public";
         const video = document.getElementById('main-video');
         let hls = new Hls({ lowLatencyMode: true });
