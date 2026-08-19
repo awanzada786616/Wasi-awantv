@@ -19,48 +19,45 @@
         
         body { margin: 0; background: #121212; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
 
-        /* HEADER JAZZ STYLE */
+        /* WELCOME DIALOGUE */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000000; }
+        .modal-box { background: #1a1a1a; width: 85%; max-width: 350px; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(240, 125, 58, 0.3); }
+        .modal-box h3 { color: var(--primary); margin: 0 0 10px; font-weight: 900; }
+        .modal-box p { font-size: 14px; color: #bbb; line-height: 1.5; margin-bottom: 20px; }
+        .modal-box .dev-text { font-size: 11px; color: #666; margin-top: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-btn { background: var(--primary); color: #fff; border: none; padding: 12px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; display: block; width: 100%; margin-bottom: 10px; text-decoration: none; }
+        .close-modal { background: #333; color: #fff; border: none; padding: 10px; border-radius: 25px; width: 100%; cursor: pointer; font-size: 12px; }
+
+        /* HEADER */
         header { padding: 15px; background: #000; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .pill-logo { background: #d32f2f; color: #fff; padding: 4px 35px; border-radius: 20px; font-weight: 900; font-size: 18px; }
         .notif-icon { position: absolute; right: 20px; font-size: 22px; color: #fff; cursor: pointer; }
         #notif-badge { position: absolute; top: -5px; right: -5px; background: red; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 1px solid #000; }
 
-        /* SKELETON */
-        .skeleton { background: #222; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 10px; }
-        @keyframes loading { to { background-position: -200% 0; } }
-
-        /* CONTENT GRID */
+        /* GRID & CARDS */
         .section-title { padding: 15px 15px 5px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
-        
-        /* JAZZ TV CARDS WITH MARQUEE */
         .card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #fff; padding: 10px; }
         .card-info { background: #fff; padding: 6px 0; overflow: hidden; border-top: 1px solid #eee; }
-        
         .marquee-box { white-space: nowrap; display: inline-block; padding-left: 100%; animation: slow-move 10s linear infinite; font-size: 10px; font-weight: 900; color: #000; text-transform: uppercase; }
         @keyframes slow-move { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
-        /* --- PRO PLAYER UI --- */
+        /* SKELETON */
+        .skeleton { background: #222; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: load-skel 1.5s infinite; border-radius: 10px; }
+        @keyframes load-skel { to { background-position: -200% 0; } }
+
+        /* PLAYER UI */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; }
         #main-video { width: 100%; height: 100%; object-fit: contain; }
-
         .p-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.4s ease; z-index: 10002; }
         .ui-hide { opacity: 0; pointer-events: none; }
-
-        /* CENTER CONTROLS WITH SPINNER */
         .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 50px; z-index: 10005; pointer-events: none; }
         .p-center i, .play-wrapper { pointer-events: auto; }
-        
         .play-wrapper { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
         .white-spinner { position: absolute; width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .play-btn-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 25px; cursor: pointer; box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index: 10; }
-
-        .p-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 10006; }
-        .p-bottom { width: 100%; position: relative; z-index: 10006; }
-        .seekbar { width: 100%; accent-color: var(--primary); height: 4px; cursor: pointer; }
 
         /* FOOTER & NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; padding: 10px 0; border-top: 1px solid #222; z-index: 1000; }
@@ -72,6 +69,17 @@
     </style>
 </head>
 <body>
+
+    <!-- WELCOME MODAL -->
+    <div class="modal-overlay" id="welcome-modal">
+        <div class="modal-box">
+            <h3>WASI TV PRO</h3>
+            <p>Welcome! Join our official WhatsApp group for the latest updates and new channel links.</p>
+            <a href="https://chat.whatsapp.com/IcYpWwF4WXEEcgjIxXXRM4?s=cl&p=a&ilr=0" target="_blank" class="modal-btn">Join WhatsApp Group</a>
+            <button class="close-modal" onclick="$('#welcome-modal').fadeOut()">Maybe Later</button>
+            <div class="dev-text">Developed by Wasi Developer</div>
+        </div>
+    </div>
 
     <header>
         <div class="pill-logo">Jazz Tv</div>
@@ -88,9 +96,7 @@
     <!-- PLAYER OVERLAY -->
     <div id="player-overlay" onclick="togglePlayerUI()">
         <video id="main-video" playsinline></video>
-
         <div class="p-ui" id="p-controls">
-            <!-- Top Controls -->
             <div class="p-top" onclick="event.stopPropagation()">
                 <div style="display:flex; align-items:center; gap:15px;">
                     <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
@@ -101,22 +107,14 @@
                     <i class="fa-solid fa-lock-open" id="lock-icon" onclick="toggleLock(event)"></i>
                 </div>
             </div>
-
-            <!-- Center Controls -->
             <div class="p-center" id="ctrl-center">
                 <i class="fa-solid fa-backward-step" onclick="event.stopPropagation(); video.currentTime -= 10"></i>
-                
                 <div class="play-wrapper" onclick="event.stopPropagation()">
                     <div class="white-spinner" id="p-loader"></div>
-                    <div class="play-btn-circle" onclick="togglePlay()">
-                        <i class="fa-solid fa-play" id="play-icon"></i>
-                    </div>
+                    <div class="play-btn-circle" onclick="togglePlay()"><i class="fa-solid fa-play" id="play-icon"></i></div>
                 </div>
-
                 <i class="fa-solid fa-forward-step" onclick="event.stopPropagation(); video.currentTime += 10"></i>
             </div>
-
-            <!-- Bottom Controls -->
             <div class="p-bottom" id="ctrl-bottom" onclick="event.stopPropagation()">
                 <input type="range" class="seekbar" id="seekbar" value="0" step="0.1" oninput="manualSeek(this.value)">
                 <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;">
@@ -127,7 +125,6 @@
         </div>
     </div>
 
-    <!-- FOOTER NAV -->
     <div class="bottom-nav">
         <div class="nav-item" onclick="goToHash('#home'); loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item active" onclick="goToHash('#tv'); loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
@@ -136,7 +133,7 @@
     </div>
 
     <script>
-        const API = location.origin + "/api/public";
+        const API = "https://wasitv.lovable.app/api/public"; // Updated API URL
         const video = document.getElementById('main-video');
         let hls = new Hls();
         let uiTimeout;
@@ -146,13 +143,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- NAVIGATION & ROUTING ---
         function goToHash(h) { history.pushState(null, '', h); }
 
         window.onpopstate = function() {
             const h = window.location.hash;
-            if (h === "#player") { /* Do nothing */ }
-            else { 
+            if (h !== "#player") { 
                 $('#player-overlay').fadeOut(); 
                 video.pause();
                 if(window.Android) window.Android.rotatePortrait();
@@ -168,7 +163,6 @@
             else loadTab('tv', $('.nav-item')[1]);
         }
 
-        // --- UI LOADING ---
         async function loadTab(tab, el) {
             if(el) { $('.nav-item').removeClass('active'); $(el).addClass('active'); }
             $('#app-content').html('<div class="grid">' + '<div class="skeleton" style="aspect-ratio:1/1.2;"></div>'.repeat(9) + '</div>');
@@ -206,14 +200,12 @@
             $('#app-content').html(h + '</div>');
         }
 
-        // --- PLAYER LOGIC ---
         function playStream(slug, name) {
             goToHash('#player');
             $('#v-title').text(name);
             $('#player-overlay').fadeIn();
             $('#p-loader').show();
             if(window.Android) window.Android.rotateLandscape();
-
             let url = slug.startsWith('http') ? slug : `${API}/stream?slug=${slug}&type=channel`;
             if (Hls.isSupported()) {
                 hls.destroy(); hls = new Hls();
@@ -223,66 +215,32 @@
             showControls();
         }
 
-        function togglePlayerUI() {
-            if ($('#p-controls').hasClass('ui-hide')) {
-                showControls();
-            } else {
-                hideControls();
-            }
-        }
-
+        function togglePlayerUI() { $('#p-controls').hasClass('ui-hide') ? showControls() : hideControls(); }
         function showControls() {
             $('#p-controls').removeClass('ui-hide');
             clearTimeout(uiTimeout);
-            if (!isLocked) uiTimeout = setTimeout(hideControls, 4000);
-            else uiTimeout = setTimeout(hideControls, 2000); // Hide lock faster
+            uiTimeout = setTimeout(hideControls, isLocked ? 2000 : 4000);
         }
-
-        function hideControls() {
-            $('#p-controls').addClass('ui-hide');
-        }
-
-        function togglePlay() {
-            if(isLocked) return;
-            video.paused ? video.play() : video.pause();
-            showControls();
-        }
-
+        function hideControls() { $('#p-controls').addClass('ui-hide'); }
+        function togglePlay() { if(!isLocked) { video.paused ? video.play() : video.pause(); showControls(); } }
         function toggleLock(e) {
             e.stopPropagation();
             isLocked = !isLocked;
-            if(isLocked) {
-                $('#lock-icon').attr('class', 'fa-solid fa-lock');
-                $('#ctrl-center, #ctrl-bottom').fadeOut(200);
-            } else {
-                $('#lock-icon').attr('class', 'fa-solid fa-lock-open');
-                $('#ctrl-center, #ctrl-bottom').fadeIn(200);
-            }
+            $('#lock-icon').attr('class', isLocked ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open');
+            isLocked ? $('#ctrl-center, #ctrl-bottom').fadeOut(200) : $('#ctrl-center, #ctrl-bottom').fadeIn(200);
             showControls();
         }
-
-        function manualSeek(v) {
-            video.currentTime = (v / 100) * video.duration;
-            showControls();
-        }
+        function manualSeek(v) { video.currentTime = (v / 100) * video.duration; showControls(); }
 
         video.onwaiting = () => $('#p-loader').show();
-        video.onplaying = () => { 
-            $('#p-loader').hide(); 
-            $('#play-icon').attr('class', 'fa-solid fa-pause');
-            uiTimeout = setTimeout(hideControls, 3000);
-        };
-        video.onpause = () => {
-            $('#play-icon').attr('class', 'fa-solid fa-play');
-            showControls();
-        };
+        video.onplaying = () => { $('#p-loader').hide(); $('#play-icon').attr('class', 'fa-solid fa-pause'); setTimeout(hideControls, 3000); };
+        video.onpause = () => { $('#play-icon').attr('class', 'fa-solid fa-play'); showControls(); };
         video.ontimeupdate = () => {
             $('#seekbar').val((video.currentTime / video.duration) * 100 || 0);
             let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
             $('#c-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
 
-        // NOTIFICATIONS
         function loadNotifications() {
             db.ref('app_notifications').once('value', s => {
                 const data = s.val() || {};
@@ -290,9 +248,7 @@
                 $('#notif-badge').hide();
                 let h = '<div class="section-title">Notifications</div>';
                 Object.values(data).reverse().forEach(n => {
-                    h += `<div style="background:#222; padding:15px; border-radius:10px; margin:10px; border-left:4px solid var(--primary);">
-                            <b>${n.title}</b><p style="font-size:12px;color:#888;margin:5px 0 0;">${n.message}</p>
-                          </div>`;
+                    h += `<div style="background:#222; padding:15px; border-radius:10px; margin:10px; border-left:4px solid var(--primary);"><b>${n.title}</b><p style="font-size:12px;color:#888;margin:5px 0 0;">${n.message}</p></div>`;
                 });
                 $('#app-content').html(h || '<p style="text-align:center;padding:50px;">No messages</p>');
             });
@@ -304,7 +260,11 @@
             if(count > seen) $('#notif-badge').text(count-seen).css('display','flex');
         });
 
-        $(document).ready(() => handleRouting(window.location.hash));
+        $(document).ready(() => {
+            handleRouting(window.location.hash);
+            // Show welcome dialogue on start
+            $('#welcome-modal').fadeIn();
+        });
     </script>
 </body>
 </html>
