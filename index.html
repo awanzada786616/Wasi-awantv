@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -11,44 +11,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — Pro Black</title>
+    <title>Wasi TV Pro</title>
 
     <style>
         :root { --primary: #ff9800; --bg: #000000; --card-bg: #121212; --border: #1f1f1f; --text: #ffffff; }
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; text-decoration: none !important; }
         
         body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 90px; overflow-x: hidden; }
 
-        header { padding: 15px; text-align: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        header { padding: 15px; text-align: center; background: #000; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: var(--primary); font-size: 22px; margin: 0; font-weight: 800; }
 
-        .notif-btn { position: relative; cursor: pointer; color: var(--primary); font-size: 22px; }
-        #notif-badge { position: absolute; top: -5px; right: -5px; background: #ff3b30; color: #fff; font-size: 10px; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid var(--bg); }
+        .notif-btn { position: relative; color: var(--primary); font-size: 22px; }
+        #notif-badge { position: absolute; top: -5px; right: -5px; background: #ff3b30; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #000; }
 
-        #slider-container { width: 94%; aspect-ratio: 16/9; margin: 15px auto; border-radius: 15px; overflow: hidden; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        #slider-container { width: 94%; aspect-ratio: 16/9; margin: 15px auto; border-radius: 15px; overflow: hidden; display: none; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        .section-title { padding: 20px 15px 5px; font-size: 14px; font-weight: 600; color: #777; text-transform: uppercase; letter-spacing: 1px; }
+        .section-title { padding: 20px 15px 5px; font-size: 13px; font-weight: 600; color: #666; text-transform: uppercase; }
         .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
-        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; text-align: center; position: relative; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 10px; }
-        .card.portrait img { aspect-ratio: 2/3; object-fit: cover; padding: 0; }
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; text-align: center; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; padding: 10px; display: block; margin: 0 auto; }
         .card-title { font-size: 10px; font-weight: 600; color: #eee; padding: 8px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* PLAYER LANDSCAPE FIX */
-        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; }
-        #main-video { width: 100%; height: 100%; }
+        /* --- PLAYER STYLING --- */
+        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; }
+        #main-video { width: 100%; height: 100%; object-fit: contain; }
+        .player-controls { position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.3s; }
+        .ui-hidden { opacity: 0; pointer-events: none; }
 
-        /* FOOTER NAVIGATION */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; display: flex; padding: 12px 0; border-top: 1px solid var(--border); z-index: 2000; justify-content: space-around; }
-        .nav-item { color: #555; text-align: center; flex: 1; font-size: 10px; font-weight: 600; display: flex; flex-direction: column; gap: 4px; }
+        /* --- FOOTER --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #080808; display: flex; padding: 12px 0; border-top: 1px solid var(--border); z-index: 2000; }
+        .nav-item { color: #444; text-align: center; flex: 1; font-size: 10px; font-weight: 600; display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
         .nav-item i { font-size: 18px; }
         .nav-item.active { color: var(--primary); }
 
-        /* NOTIFICATION CARDS */
-        .notif-card { background: #151515; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid var(--primary); }
-        .notif-card h3 { margin: 0 0 5px; font-size: 16px; color: var(--primary); }
-        .notif-card p { margin: 0; font-size: 13px; color: #bbb; }
+        .notif-card { background: #111; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -65,11 +63,20 @@
     <div id="slider-container"></div>
     <div id="main-content"></div>
 
-    <!-- PLAYER -->
-    <div id="player-overlay">
+    <!-- PLAYER OVERLAY -->
+    <div id="player-overlay" onclick="toggleUI()">
         <video id="main-video" playsinline></video>
-        <div style="position:absolute; top:20px; left:20px; z-index:100;">
-            <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:30px; color:#fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8);"></i>
+        <div class="player-controls" id="p-ui">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:25px;"></i>
+                <span id="p-title" style="font-weight:bold; font-size:16px;">Loading...</span>
+            </div>
+            <div style="align-self:center;">
+                <i class="fa-solid fa-play" id="play-btn" style="font-size:50px; color:var(--primary);" onclick="event.stopPropagation(); togglePlay()"></i>
+            </div>
+            <div style="text-align:right;">
+                 <i class="fa-solid fa-expand" onclick="event.stopPropagation(); goFull()" style="font-size:20px; color:#888;"></i>
+            </div>
         </div>
     </div>
 
@@ -103,12 +110,10 @@
         async function loadTab(tab, el) {
             $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
             $('#main-content, #slider-container').hide();
-            
             if(tab === 'home') {
                 const r = await fetch(`${API}/feed`).then(r=>r.json());
-                renderSlider(r.slider);
-                $('#main-content').show().html('');
-                renderSection('Live Free Sports', r.sports);
+                renderSlider(r.slider); $('#main-content').show().html('');
+                renderSection('Live Sports', r.sports);
             } else if(tab === 'missing') {
                 $('#main-content').show().html('<div class="section-title">Missing Sports</div><div id="missing-list" class="playlist-grid"></div>');
                 db.ref('missing_sports').once('value', s => renderSectionIn('missing-list', Object.values(s.val() || {})));
@@ -122,8 +127,7 @@
             $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
             $('#slider-container, #main-content').hide();
             const r = await fetch(`${API}/feed`).then(r=>r.json());
-            $('#main-content').show().html('');
-            renderSection('All Live TV', r.channels);
+            $('#main-content').show().html(''); renderSection('Live Channels', r.channels);
         }
 
         async function loadTrending(el) {
@@ -138,10 +142,11 @@
             if(!items) return;
             let html = `<div class="section-title">${title}</div><div class="playlist-grid">`;
             items.forEach(i => {
-                const port = (i.type !== 'channel') ? 'portrait' : '';
-                html += `<div class="card ${port}" onclick="playStream('${i.slug}','${i.type||'channel'}','${i.name||i.channelName}')">
-                    <img src="${i.image || i.logo}" loading="lazy">
-                    <div class="card-title">${i.name || i.channelName}</div>
+                const name = i.name || i.channelName || "Unknown";
+                const img = i.image || i.logo || "";
+                html += `<div class="card" onclick="playStream('${i.slug}','${i.type||'channel'}','${name}')">
+                    <img src="${img}" loading="lazy">
+                    <div class="card-title">${name}</div>
                 </div>`;
             });
             $('#main-content').append(html + '</div>');
@@ -150,9 +155,11 @@
         function renderSectionIn(divId, items) {
             let html = '';
             items.forEach(i => {
-                html += `<div class="card" onclick="playStream('${i.slug}','channel','${i.channelName}')">
-                    <img src="${i.logo}" loading="lazy">
-                    <div class="card-title">${i.channelName}</div>
+                const name = i.channelName || i.name || "Unknown";
+                const img = i.logo || i.image || "";
+                html += `<div class="card" onclick="playStream('${i.slug}','channel','${name}')">
+                    <img src="${img}" loading="lazy">
+                    <div class="card-title">${name}</div>
                 </div>`;
             });
             $('#' + divId).html(html);
@@ -160,15 +167,25 @@
 
         function playStream(slug, type, name) {
             goToHash('#player');
+            // --- ROTATION SIGNAL ---
             if(window.Android) window.Android.rotateLandscape();
+            
+            $('#p-title').text(name);
             $('#player-overlay').show();
             let url = slug.startsWith('http') ? slug : API + "/stream?slug=" + slug + "&type=" + type;
-            // logic same as before...
             if (Hls.isSupported()) { hls.destroy(); hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
             else { video.src = url; video.play(); }
         }
 
-        function closePlayer() { video.pause(); $('#player-overlay').hide(); if(window.Android) window.Android.rotatePortrait(); }
+        function closePlayer() { 
+            video.pause(); $('#player-overlay').hide(); 
+            if(window.Android) window.Android.rotatePortrait(); 
+        }
+
+        function togglePlay() { video.paused ? video.play() : video.pause(); }
+        function toggleUI() { $('#p-ui').toggleClass('ui-hidden'); }
+        video.onplaying = () => { $('#play-btn').attr('class', 'fa-solid fa-pause'); };
+        video.onpause = () => { $('#play-btn').attr('class', 'fa-solid fa-play'); };
 
         function loadInbox() {
             db.ref('app_notifications').once('value', s => {
