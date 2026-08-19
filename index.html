@@ -5,81 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV Ultimate Pro</title>
+    <title>Wasi TV Ultimate</title>
 
     <style>
-        :root { --primary: #f07d3a; --bg: #000; }
+        :root { --primary: #f07d3a; --bg: #000; --card-white: #fff; }
         * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; background: #121212; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000000; }
-        .modal-box { background: #1a1a1a; width: 85%; max-width: 350px; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid var(--primary); }
-        .modal-btn { background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; display: block; width: 100%; text-decoration: none; margin-top: 15px; }
-
-        /* HEADER */
+        /* HEADER JAZZ STYLE */
         header { padding: 15px; background: #000; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
         .pill-logo { background: #d32f2f; color: #fff; padding: 4px 35px; border-radius: 20px; font-weight: 900; font-size: 18px; }
         .notif-icon { position: absolute; right: 20px; font-size: 22px; color: #fff; cursor: pointer; }
-        #notif-badge { position: absolute; top: -5px; right: -5px; background: red; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 1px solid #000; }
+        #notif-badge { position: absolute; top: -5px; right: -5px; background: red; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
 
-        /* SLIDER */
+        /* SLIDER (FETCH FROM LOVABLE) */
         #slider-container { width: 100%; height: 190px; overflow: hidden; position: relative; display: none; margin-bottom: 10px; }
         .slide { width: 100%; height: 100%; position: absolute; display: none; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* GRID */
+        /* GRID & CARDS (NO MARQUEE) */
         .section-title { padding: 15px 15px 5px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
-        .card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; }
+        .card { background: var(--card-white); border-radius: 12px; overflow: hidden; border: 1px solid #333; display: flex; flex-direction: column; text-align: center; }
         .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #fff; padding: 12px; }
-        .card-info { background: #fff; padding: 6px 0; overflow: hidden; border-top: 1px solid #eee; }
-        .marquee-box { white-space: nowrap; display: inline-block; padding-left: 100%; animation: slow-move 10s linear infinite; font-size: 10px; font-weight: 900; color: #000; text-transform: uppercase; }
-        @keyframes slow-move { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        .card-name { background: #fff; color: #000; padding: 8px 4px; font-size: 10px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid #eee; text-transform: uppercase; }
 
-        /* SKELETON */
-        .skeleton { background: #222; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: load-skel 1.5s infinite; border-radius: 10px; }
-        @keyframes load-skel { to { background-position: -200% 0; } }
-
-        /* PLAYER */
+        /* PLAYER OVERLAY (FORCED LANDSCAPE) */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; }
-        #main-video { width: 100%; height: 100%; object-fit: contain; }
+        #main-video { width: 100%; height: 100%; transition: 0.3s; }
+        .fit-contain { object-fit: contain !important; }
+        .fit-cover { object-fit: cover !important; }
+        .fit-fill { object-fit: fill !important; }
+
         .p-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.4s ease; z-index: 10002; }
         .ui-hide { opacity: 0; pointer-events: none; }
+
         .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 50px; z-index: 10005; pointer-events: none; }
         .p-center i, .play-wrapper { pointer-events: auto; }
+        
+        /* WHITE SPINNER AROUND CIRCLE PLAY BUTTON */
         .play-wrapper { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
         .white-spinner { position: absolute; width: 80px; height: 80px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .play-btn-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 25px; cursor: pointer; }
+        .play-btn-circle { width: 60px; height: 60px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 25px; cursor: pointer; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
-        /* FOOTER */
+        .seekbar { width: 100%; accent-color: var(--primary); height: 4px; cursor: pointer; }
+        .fit-btn { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid #666; padding: 5px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; }
+
+        /* FOOTER & NAV */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; padding: 10px 0; border-top: 1px solid #222; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item.active { color: #fff; }
         .nav-item.active i { background: var(--primary); padding: 6px 25px; border-radius: 20px; margin-top: -5px; color: #fff; }
 
         .wa-btn { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: #fff; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 999; }
+        
+        /* LANDSCAPE FORCE CLASS */
+        .landscape-mode { width: 100vh !important; height: 100vw !important; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; position: fixed; inset: 0; }
     </style>
 </head>
 <body>
-
-    <div class="modal-overlay" id="welcome-modal">
-        <div class="modal-box">
-            <h3 style="color:var(--primary);margin:0;">WASI TV PRO</h3>
-            <p style="font-size:13px;color:#bbb;">Join our official WhatsApp group for latest news.</p>
-            <a href="https://chat.whatsapp.com/IcYpWwF4WXEEcgjIxXXRM4?s=cl&p=a&ilr=0" target="_blank" class="modal-btn">Join WhatsApp Group</a>
-            <button onclick="$('#welcome-modal').fadeOut()" style="background:none;border:none;color:#666;margin-top:10px;cursor:pointer;">Close</button>
-            <div style="font-size:10px;color:#444;margin-top:15px;">Developed by Wasi Developer</div>
-        </div>
-    </div>
 
     <header>
         <div class="pill-logo">Jazz Tv</div>
@@ -96,12 +88,16 @@
 
     <!-- PLAYER -->
     <div id="player-overlay" onclick="togglePlayerUI()">
-        <video id="main-video" playsinline></video>
+        <video id="main-video" class="fit-contain" playsinline></video>
         <div class="p-ui" id="p-controls">
             <div class="p-top" onclick="event.stopPropagation()">
-                <div style="display:flex; align-items:center; gap:15px;"><i class="fa-solid fa-arrow-left" onclick="history.back()"></i><span id="v-title" style="font-weight:700;">Loading...</span></div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <i class="fa-solid fa-arrow-left" onclick="history.back()"></i>
+                    <span id="v-title" style="font-weight:700;">Loading...</span>
+                </div>
                 <div style="display:flex; gap:20px;"><i class="fa-solid fa-chromecast"></i><i class="fa-solid fa-lock-open" id="lock-icon" onclick="toggleLock(event)"></i></div>
             </div>
+            
             <div class="p-center" id="ctrl-center">
                 <i class="fa-solid fa-backward-step" onclick="event.stopPropagation(); video.currentTime -= 10"></i>
                 <div class="play-wrapper" onclick="event.stopPropagation()">
@@ -110,9 +106,14 @@
                 </div>
                 <i class="fa-solid fa-forward-step" onclick="event.stopPropagation(); video.currentTime += 10"></i>
             </div>
+
             <div class="p-bottom" id="ctrl-bottom" onclick="event.stopPropagation()">
                 <input type="range" class="seekbar" id="seekbar" value="0" step="0.1" oninput="manualSeek(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;"><span id="c-time">00:00</span><span style="color:#ff4444; font-weight:900;">LIVE</span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <span id="c-time" style="font-size:11px;">00:00</span>
+                    <button class="fit-btn" onclick="toggleFit()">FIT: <span id="fit-text">Contain</span></button>
+                    <span style="color:#ff4444; font-weight:900; font-size:11px;">LIVE</span>
+                </div>
             </div>
         </div>
     </div>
@@ -124,62 +125,41 @@
     </div>
 
     <script>
-        const API_V5 = "https://web.jazztv.pk/alpha/api_gateway/v5/web/";
-        const API_V3 = "https://web.jazztv.pk/alpha/api_gateway/v3/web/";
-        const PHP_GATEWAY = "https://jazztv.pk/alpha/api_gateway/index.php/media/";
-        const SLIDER_API = "https://wasitv.lovable.app/api/public/slider";
-
+        let token = "";
         const video = document.getElementById('main-video');
         let hls = new Hls();
-        let cachedToken = null;
-        let uiTimeout, isLocked = false;
+        let uiTimeout, isLocked = false, currentFit = 0;
 
         // Firebase Setup
         const firebaseConfig = { databaseURL: "https://wasitv-63ff0-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- Jazz TV Decryption ---
-        function decryptAes(text) {
-            if (!text) return null;
-            const keyStr = "gTOwkDMjlDZ0EjY58GcsVWM4oGOllnd4VzN3UmZsBHc";
-            const reversed = keyStr.split('').reverse().join('');
-            const key = atob(reversed);
-            const iv = CryptoJS.enc.Utf8.parse("fpmjlrbhpljoennm");
+        // --- Jazz Decryption Logic (V6/V3) ---
+        function decrypt(e) {
             try {
-                const ct = CryptoJS.enc.Hex.parse(text);
-                const decrypted = CryptoJS.AES.decrypt({ ciphertext: ct }, CryptoJS.enc.Utf8.parse(key), { iv: iv });
-                return JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                const kR = "gTOwkDMjlDZ0EjY58GcsVWM4oGOllnd4VzN3UmZsBHc";
+                const k = CryptoJS.enc.Utf8.parse(atob(kR.split('').reverse().join('')));
+                const iv = CryptoJS.enc.Utf8.parse("fpmjlrbhpljoennm");
+                const d = CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Hex.parse(e) }, k, { iv: iv });
+                return JSON.parse(d.toString(CryptoJS.enc.Utf8));
             } catch (e) { return null; }
         }
 
-        // --- Auth Token Generator ---
-        async function getAuthToken() {
-            if (cachedToken) return cachedToken;
-            const deviceId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
+        async function getAuth() {
+            if(token) return token;
+            const r = await fetch('https://web.jazztv.pk/alpha/api_gateway/v6/auth/login', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: "S29Pb3Q3eTl4dnUxRk5HME9sa0dXdVh0QjZmNXpoRDBAd2ViLmNvbQ==", city: "S29Pb3Q3eTl4dnUxRk5HME9sa0dXdVh0QjZmNXpoRDA" })
             });
-            try {
-                const res = await fetch(`${API_V5}auth/guest-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ device_id: deviceId, platform: "web" })
-                });
-                const json = await res.json();
-                const data = decryptAes(json.eData);
-                if (data && data.access_token) {
-                    cachedToken = data.access_token;
-                    return cachedToken;
-                }
-            } catch (e) { return ""; }
+            const d = await r.json(); token = d.token; return token;
         }
 
-        // --- Routing ---
+        // --- Navigation ---
         function goToHash(h) { history.pushState(null, '', h); }
         window.onpopstate = () => {
             const h = window.location.hash;
-            if (h !== "#player") { $('#player-overlay').fadeOut(); video.pause(); handleRouting(h); }
+            if (h !== "#player") { closePlayer(); handleRouting(h); }
         };
 
         function handleRouting(h) {
@@ -189,16 +169,17 @@
             else loadTab('home', $('.nav-item')[0]);
         }
 
-        // --- UI Logic ---
+        // --- Slider (wasitv.lovable.app) ---
         async function loadSlider() {
             try {
-                const r = await fetch(SLIDER_API).then(res => res.json());
+                const r = await fetch('https://wasitv.lovable.app/api/public/slider').then(res => res.json());
                 let html = '';
                 r.forEach((s, idx) => { html += `<div class="slide" ${idx===0?'style="display:block"':''}><img src="${s.image}"></div>`; });
                 $('#slider-container').html(html).show();
                 let current = 0;
                 setInterval(() => {
                     const slides = $('.slide');
+                    if(slides.length < 2) return;
                     slides.eq(current).fadeOut(500);
                     current = (current + 1) % slides.length;
                     slides.eq(current).fadeIn(500);
@@ -206,88 +187,118 @@
             } catch(e) { $('#slider-container').hide(); }
         }
 
+        // --- Tab Loading ---
         async function loadTab(tab, el) {
             if(el) { $('.nav-item').removeClass('active'); $(el).addClass('active'); }
-            $('#app-content').html('<div class="grid">' + '<div class="skeleton" style="aspect-ratio:1/1.2;"></div>'.repeat(9) + '</div>');
+            $('#app-content').html('<div style="text-align:center;padding:50px;color:#666;">Loading...</div>');
             $('#slider-container').hide();
+
+            const t = await getAuth();
 
             if (tab === 'home') {
                 loadSlider();
-                const token = await getAuthToken();
-                const res = await fetch(`${API_V5}genre-programs-carousal`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ genre_slug: 'live-tv', project_id: "2", platform: "web" })
-                }).then(r => r.json());
-                const data = decryptAes(res.eData);
-                render('Top Channels', data?.data?.programData || []);
-            } else if (tab === 'tv') {
-                const token = await getAuthToken();
-                const res = await fetch(`${API_V3}live-tv`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify({ project_id: "2", platform: "web" }),
-                }).then(r => r.json());
-                const data = decryptAes(res.eData);
-                render('Jazz TV Channels', data?.data?.channels || []);
-            } else if (tab === 'missing') {
-                db.ref('missing_sports').once('value', s => render('Missing Channels', Object.values(s.val() || {}), true));
-            } else if (tab === 'notif') {
+                const r = await fetch('https://web.jazztv.pk/alpha/api_gateway/v3/web/live-tv', { 
+                    method: 'POST', 
+                    headers: { 'Authorization': `Bearer ${t}`, 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ project_id: "2", platform: "web" }) 
+                });
+                const d = await r.json();
+                const channels = d.eData ? decrypt(d.eData).data.channels : d.data.channels;
+                render('Featured Channels', channels.slice(0, 9));
+            } 
+            else if (tab === 'tv') {
+                const r = await fetch('https://web.jazztv.pk/alpha/api_gateway/v6/web/live-tv', { 
+                    method: 'POST', headers: { 'Authorization': `Bearer ${t}` }, 
+                    body: new FormData() 
+                });
+                const d = decrypt((await r.json()).eData).data.channels;
+                render('Live TV Channels', d);
+            } 
+            else if (tab === 'missing') {
+                db.ref('missing_sports').once('value', s => render('Missing Channels', Object.values(s.val() || {})));
+            }
+            else if (tab === 'notif') {
                 loadNotifications();
             }
         }
 
-        function render(title, items, isFirebase = false) {
+        function render(title, items) {
             let h = `<div class="section-title">${title}</div><div class="grid">`;
             items.forEach(i => {
-                const name = i.channelName || i.name || i.title;
-                const img = i.logo || i.image || i.portrait_poster;
-                const slug = i.channelSlug || i.slug;
-                h += `<div class="card" onclick="playStream('${slug}','${name}')">
+                const name = i.channelName || i.name;
+                const img = i.logo || i.thumbnail || i.image;
+                h += `<div class="card" onclick="playStream('${i.channelSlug || i.slug}','${name}')">
                     <img src="${img}" onerror="this.src='https://via.placeholder.com/150'">
-                    <div class="card-info"><div class="marquee-box">${name} &nbsp; • &nbsp; ${name}</div></div>
+                    <div class="card-name">${name}</div>
                 </div>`;
             });
             $('#app-content').html(h + '</div>');
         }
 
+        // --- Player System ---
         async function playStream(slug, name) {
             goToHash('#player');
             $('#v-title').text(name);
             $('#player-overlay').fadeIn();
             $('#p-loader').show();
-            if(window.Android) window.Android.rotateLandscape();
+            
+            // Auto Rotate logic
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {
+                    $('#player-overlay').addClass('landscape-mode');
+                });
+            } else {
+                $('#player-overlay').addClass('landscape-mode');
+            }
 
             try {
-                const response = await fetch(`${PHP_GATEWAY}get-channel-url`, {
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "slug": slug, "phone_details": navigator.userAgent, "user_id": "0", "mobile": "0" })
+                const t = await getAuth();
+                const fd = new FormData();
+                fd.append("slug", slug); fd.append("type", "channel"); fd.append("phone_details", "WEB");
+                const res = await fetch('https://web.jazztv.pk/alpha/api_gateway/v6/web/get-channel-url', {
+                    method: 'POST', headers: { 'Authorization': `Bearer ${t}` }, body: fd
                 });
-                const json = await response.json();
-                const data = decryptAes(json.eData);
-                const streamUrl = data?.data?.ChannelStreamingUrls || data?.data?.HlsUrl || data?.ChannelStreamingUrls || "";
+                const d = decrypt((await res.json()).eData);
+                const url = d.data.ChannelStreamingUrls || d.data.BackupLiveStreamUrl;
 
                 if (Hls.isSupported()) {
                     hls.destroy(); hls = new Hls();
-                    hls.loadSource(streamUrl); hls.attachMedia(video);
+                    hls.loadSource(url); hls.attachMedia(video);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-                } else { video.src = streamUrl; video.play(); }
+                } else { video.src = url; video.play(); }
                 showControls();
-            } catch (e) { alert("Stream not available"); }
+            } catch(e) { alert("Stream Error"); }
         }
 
-        // Player Controls
+        function closePlayer() {
+            video.pause();
+            $('#player-overlay').fadeOut().removeClass('landscape-mode');
+            if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+        }
+
         function togglePlayerUI() { $('#p-controls').hasClass('ui-hide') ? showControls() : hideControls(); }
         function showControls() { $('#p-controls').removeClass('ui-hide'); clearTimeout(uiTimeout); uiTimeout = setTimeout(hideControls, 4000); }
         function hideControls() { $('#p-controls').addClass('ui-hide'); }
+        
         function togglePlay() { if(!isLocked) { video.paused ? video.play() : video.pause(); showControls(); } }
+        
+        function toggleFit() {
+            const fits = ['fit-contain', 'fit-cover', 'fit-fill'];
+            const labels = ['Contain', 'Cover', 'Fill'];
+            $('#main-video').removeClass(fits[currentFit]);
+            currentFit = (currentFit + 1) % fits.length;
+            $('#main-video').addClass(fits[currentFit]);
+            $('#fit-text').text(labels[currentFit]);
+            showControls();
+        }
+
         function toggleLock(e) {
             e.stopPropagation(); isLocked = !isLocked;
             $('#lock-icon').attr('class', isLocked ? 'fa-solid fa-lock' : 'fa-solid fa-lock-open');
             isLocked ? $('#ctrl-center, #ctrl-bottom').fadeOut() : $('#ctrl-center, #ctrl-bottom').fadeIn();
             showControls();
         }
+
         function manualSeek(v) { video.currentTime = (v / 100) * video.duration; showControls(); }
 
         video.onwaiting = () => $('#p-loader').show();
@@ -307,7 +318,7 @@
                 Object.values(data).reverse().forEach(n => {
                     h += `<div style="background:#222;padding:15px;border-radius:10px;margin:10px;border-left:4px solid var(--primary);"><b>${n.title}</b><p style="font-size:12px;color:#888;margin-top:5px;">${n.message}</p></div>`;
                 });
-                $('#app-content').html(h || '<p style="text-align:center;padding:50px;">No messages</p>');
+                $('#app-content').html(h || '<p style="text-align:center;padding:50px;color:#555;">No messages</p>');
             });
         }
 
@@ -317,7 +328,7 @@
             if(count > seen) $('#notif-badge').text(count-seen).css('display','flex');
         });
 
-        $(document).ready(() => { handleRouting(window.location.hash); $('#welcome-modal').fadeIn(); });
+        $(document).ready(() => { handleRouting(window.location.hash); });
     </script>
 </body>
 </html>
