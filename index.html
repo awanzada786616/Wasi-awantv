@@ -21,17 +21,14 @@
         header { padding: 12px; text-align: center; background: #fff; position: sticky; top: 0; z-index: 900; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         header h1 { color: var(--primary); font-size: 20px; margin: 0; font-weight: 900; }
 
-        /* NOTIFICATION BADGE */
         .notif-btn { position: relative; cursor: pointer; color: var(--primary); font-size: 22px; padding: 5px; }
         #notif-badge { position: absolute; top: 0; right: 0; background: red; color: #fff; font-size: 10px; font-weight: bold; width: 17px; height: 17px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #fff; }
 
-        /* SLIDER */
         #slider-container { width: 94%; aspect-ratio: 16/8; margin: 10px auto; border-radius: 12px; overflow: hidden; position: relative; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .slide { width: 100%; height: 100%; position: absolute; opacity: 0; transition: 0.8s; }
         .slide.active { opacity: 1; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* GRID & SECTION */
         .section-title { padding: 15px 15px 0; font-size: 14px; font-weight: bold; color: var(--primary); text-transform: uppercase; }
         .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px 15px; }
         .card { background: #fff; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; text-align: center; cursor: pointer; position: relative; }
@@ -40,18 +37,15 @@
         .card-title { font-size: 9px; font-weight: 700; color: #333; padding: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .pro-badge { position: absolute; top: 5px; right: 5px; background: #e6b800; color: #000; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px; }
 
-        /* EPISODE MODAL (OVERLAY) */
         #ep-modal { position: fixed; inset: 0; background: #fff; z-index: 5000; display: none; overflow-y: auto; padding-bottom: 50px; }
         .ep-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; position: sticky; top: 0; background: #fff; z-index: 10; }
         .ep-list { padding: 15px; }
         .ep-item { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid #eee; font-size: 14px; font-weight: bold; }
 
-        /* PLAYER & GESTURES */
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; width: 100vh; height: 100vw; transform: rotate(90deg); transform-origin: top left; margin-left: 100vw; touch-action: none; }
         #main-video { width: 100%; height: 100%; }
         #gesture-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 50%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; border: 2px solid var(--primary); color: #fff; }
 
-        /* CIRCULAR BORDER SPINNER */
         .play-wrapper { position: relative; width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; }
         #pp-btn { font-size: 55px; color: #fff; z-index: 10; cursor: pointer; }
         #btn-loader { position: absolute; inset: 0; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; }
@@ -74,7 +68,7 @@
     <header>
         <div style="width: 40px;"></div>
         <h1>Wasi TV</h1>
-        <div class="notif-btn" onclick="loadTab('notif', this)">
+        <div class="notif-btn" onclick="history.pushState(null, '', '#notif'); loadTab('notif', this)">
             <i class="fa-solid fa-bell"></i>
             <span id="notif-badge">0</span>
         </div>
@@ -83,23 +77,21 @@
     <div id="slider-container"></div>
     <div id="main-content"></div>
 
-    <!-- Episode Modal -->
     <div id="ep-modal">
         <div class="ep-header">
-            <i class="fa-solid fa-arrow-left" onclick="$('#ep-modal').fadeOut()" style="font-size:22px; margin-right:15px;"></i>
+            <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:22px; margin-right:15px;"></i>
             <h2 id="ep-title" style="margin:0; font-size:17px; color:var(--primary); flex:1;">Episodes</h2>
         </div>
         <div id="ep-desc" style="padding:15px; font-size:13px; color:#666;"></div>
         <div id="ep-list-content" class="ep-list"></div>
     </div>
 
-    <!-- PLAYER -->
     <div id="player-overlay" onclick="togglePlayerUI()">
         <div id="gesture-box"><i class="fa-solid fa-volume-high"></i><span id="gesture-percent">100%</span></div>
         <video id="main-video" playsinline></video>
         <div class="player-ui">
             <div class="p-top">
-                <i class="fa-solid fa-arrow-left" onclick="closePlayer()" style="font-size:24px;"></i>
+                <i class="fa-solid fa-arrow-left" onclick="history.back()" style="font-size:24px;"></i>
                 <span id="p-title" style="font-weight:bold; flex:1;">Channel</span>
             </div>
             <div class="p-center">
@@ -120,23 +112,32 @@
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
-        <div class="nav-item" onclick="loadTV(this)"><i class="fa-solid fa-tv"></i>Live TV</div>
-        <div class="nav-item" onclick="loadTrending(this)"><i class="fa-solid fa-fire"></i>Trending</div>
-        <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-trophy"></i>Missing</div>
+        <div class="nav-item active" onclick="history.pushState(null, '', '#home'); loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
+        <div class="nav-item" onclick="history.pushState(null, '', '#tv'); loadTV(this)"><i class="fa-solid fa-tv"></i>Live TV</div>
+        <div class="nav-item" onclick="history.pushState(null, '', '#trending'); loadTrending(this)"><i class="fa-solid fa-fire"></i>Trending</div>
+        <div class="nav-item" onclick="history.pushState(null, '', '#missing'); loadTab('missing', this)"><i class="fa-solid fa-trophy"></i>Missing</div>
     </div>
 
     <script>
-        // Jab bhi user kisi channel par click kare, ye line chale:
-window.history.pushState({page: "player"}, "player", window.location.href);
+        // ROUTING SYSTEM FOR BACK BUTTON
+        window.onpopstate = function(event) {
+            const hash = window.location.hash;
+            if (hash === "" || hash === "#home") {
+                closePlayer();
+                $('#ep-modal').fadeOut();
+                loadTab('home', $('.nav-item').first());
+            } else if (hash === "#player") {
+                // Keep player open
+            } else if (hash === "#tv") {
+                loadTV();
+            } else if (hash === "#trending") {
+                loadTrending();
+            } else {
+                closePlayer();
+                $('#ep-modal').fadeOut();
+            }
+        };
 
-// Ye code check karega ke jab back dabaya jaye toh kya karna hai
-window.onpopstate = function(event) {
-    // Agar user player se back jana chahta hai
-    if (window.location.hash === "#back") {
-        window.location.href = "/"; // Dashboard ka link
-    }
-};
         const API = location.origin + "/api/public";
         const video = document.getElementById('main-video');
         let hls = new Hls({ lowLatencyMode: true });
@@ -146,14 +147,12 @@ window.onpopstate = function(event) {
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1. SMART FETCH (Caching Logic from your snippet)
         const getFeed = () => feedCache || (feedCache = fetch(`${API}/feed`).then(r => r.json()));
         const getMovies = () => moviesCache || (moviesCache = fetch(`${API}/movies`).then(r => r.json()));
 
         async function loadTab(tab, el) {
-            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
             $('#main-content, #slider-container').hide();
-            
             if(tab === 'home') {
                 const feed = await getFeed();
                 renderSlider(feed.slider);
@@ -169,14 +168,14 @@ window.onpopstate = function(event) {
         }
 
         async function loadTV(el) {
-            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
             $('#slider-container').hide(); $('#main-content').show().html('');
             const feed = await getFeed();
             renderSection('All Live TV', feed.channels);
         }
 
         async function loadTrending(el) {
-            $('.nav-item').removeClass('active'); $(el).addClass('active');
+            $('.nav-item').removeClass('active'); if(el) $(el).addClass('active');
             $('#slider-container').hide(); $('#main-content').show().html('');
             const sections = await getMovies();
             sections.forEach(sec => renderSection(sec.title, sec.items));
@@ -196,10 +195,14 @@ window.onpopstate = function(event) {
             $('#main-content').append(html + '</div>');
         }
 
-        // HANDLER FOR DRAMAS/EPISODES
         function handleClick(slug, type, name) {
-            if (type === 'program' || type === 'series') loadEpisodes(slug, name);
-            else playStream(slug, type || 'channel', name);
+            if (type === 'program' || type === 'series') {
+                history.pushState(null, '', '#episodes');
+                loadEpisodes(slug, name);
+            } else {
+                history.pushState(null, '', '#player');
+                playStream(slug, type || 'channel', name);
+            }
         }
 
         async function loadEpisodes(slug, name) {
@@ -209,7 +212,7 @@ window.onpopstate = function(event) {
             try {
                 const data = await fetch(`${API}/program?slug=${encodeURIComponent(slug)}`).then(r => r.json());
                 $('#ep-desc').text(data.description || '');
-                let html = data.episodes.map(ep => `<div class="ep-item" onclick="playStream('${ep.slug}', 'episode', '${ep.name}')">
+                let html = data.episodes.map(ep => `<div class="ep-item" onclick="history.pushState(null,'','#player'); playStream('${ep.slug}', 'episode', '${ep.name}')">
                     <span>${ep.name} ${ep.isFree === false ? '<b style="color:red">(PRO)</b>' : ''}</span>
                     <i class="fa-solid fa-play-circle" style="color:var(--primary); font-size:20px;"></i>
                 </div>`).join('');
@@ -217,7 +220,6 @@ window.onpopstate = function(event) {
             } catch (e) { $('#ep-list-content').html('Error loading episodes.'); }
         }
 
-        // 2. PLAYER & GESTURES
         async function playStream(slug, type, name) {
             $('#ep-modal').hide();
             $('#p-title').text(name);
@@ -230,7 +232,9 @@ window.onpopstate = function(event) {
             } else { video.src = url; video.play(); }
         }
 
-        // Gesture Volume
+        function closePlayer() { video.pause(); $('#player-overlay').hide(); }
+
+        // Rest of your functions (gestures, seekbar etc.) remain same...
         let startY, startVol;
         document.getElementById('player-overlay').addEventListener('touchstart', e => { startY = e.touches[0].pageY; startVol = video.volume; });
         document.getElementById('player-overlay').addEventListener('touchmove', e => {
@@ -247,10 +251,8 @@ window.onpopstate = function(event) {
             let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
             $('#curr-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
         };
-
         function togglePlayerUI() { $('.player-ui').toggleClass('ui-hidden'); }
         function togglePlay() { video.paused ? video.play() : video.pause(); }
-        function closePlayer() { video.pause(); $('#player-overlay').hide(); }
         function manualSeek(v) { video.currentTime = (v/100) * video.duration; }
 
         function renderSlider(data) {
@@ -264,7 +266,6 @@ window.onpopstate = function(event) {
             }, 4000);
         }
 
-        // Notification Badge Logic
         db.ref('app_notifications').on('value', s => {
             const count = Object.keys(s.val() || {}).length;
             const seen = localStorage.getItem('seen_notif') || 0;
@@ -279,8 +280,10 @@ window.onpopstate = function(event) {
                 $('#notif-list').html(html || 'No messages');
             });
         }
-
-        $(document).ready(() => loadTab('home', $('.nav-item').first()));
+        $(document).ready(() => {
+            history.replaceState(null, '', '#home');
+            loadTab('home', $('.nav-item').first());
+        });
     </script>
 </body>
 </html>
