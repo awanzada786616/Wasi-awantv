@@ -8,111 +8,132 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <title>Wasi TV — Pro</title>
+    <title>Wasi TV Ultimate</title>
 
     <style>
-        :root { --primary: #f07d3a; --bg: #1a1a1a; --header-red: #d32f2f; }
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #f07d3a; --bg: #000; --card-bg: #fff; }
+        * { box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { margin: 0; background: var(--bg); color: #fff; padding-bottom: 100px; overflow-x: hidden; }
+        body { margin: 0; background: #121212; color: #fff; padding-bottom: 80px; overflow-x: hidden; }
 
-        /* JAZZ TV STYLE HEADER */
-        header { padding: 15px; text-align: center; background: #1a1a1a; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .pill-logo { background: var(--header-red); color: #fff; padding: 5px 40px; border-radius: 20px; font-weight: 800; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .notif-btn { position: absolute; right: 20px; color: #fff; font-size: 22px; cursor: pointer; }
-        #notif-badge { position: absolute; top: -5px; right: -5px; background: red; color: #fff; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid #1a1a1a; }
+        /* HEADER */
+        header { padding: 15px; background: #000; display: flex; justify-content: center; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; }
+        .pill-logo { background: #d32f2f; color: #fff; padding: 4px 35px; border-radius: 20px; font-weight: 900; font-size: 18px; }
+        .notif-icon { position: absolute; right: 20px; font-size: 22px; color: #fff; cursor: pointer; }
+        #notif-badge { position: absolute; top: -5px; right: -5px; background: #ff0000; font-size: 10px; width: 16px; height: 16px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 1px solid #000; }
 
-        /* SKELETON EFFECT */
-        .skeleton { background: #333; background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 12px; }
-        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        /* SKELETON */
+        .skeleton { background: #222; background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%); background-size: 200% 100%; animation: skeleton-hi 1.5s infinite; border-radius: 10px; }
+        @keyframes skeleton-hi { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* GRID & CARDS (EXACT JAZZ TV STYLE) */
-        .section-title { padding: 15px 15px 5px; font-size: 12px; font-weight: 700; color: #aaa; text-transform: uppercase; }
-        .playlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 12px; }
+        /* CONTENT GRID */
+        .section-title { padding: 15px 15px 5px; font-size: 13px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
         
-        .card { background: #fff; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: 1px solid #333; }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: #eee; }
-        .card-name { background: #fff; color: #000; padding: 6px 4px; font-size: 10px; font-weight: 700; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid #ddd; }
+        /* JAZZ TV BOX LOOK */
+        .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #333; display: flex; flex-direction: column; }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #fff; padding: 10px; }
+        .card-name { background: #fff; color: #000; padding: 6px 2px; font-size: 10px; font-weight: 900; text-align: center; white-space: nowrap; overflow: hidden; border-top: 1px solid #eee; text-transform: uppercase; }
 
-        /* PROFESSIONAL PLAYER */
-        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 99999; }
-        #main-video { width: 100%; height: 100%; }
-        
-        /* Arc Spinner exactly in center */
-        .spinner { width: 60px; height: 60px; border: 4px solid transparent; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* --- PROFESSIONAL PLAYER --- */
+        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; }
+        #main-video { width: 100%; height: 100%; object-fit: contain; }
 
-        .player-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 25px; transition: 0.5s; }
-        .ui-hide { opacity: 0; pointer-events: none; }
+        /* Perfectly Centered Spinner */
+        .spinner-box { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 100; }
+        .arc-spinner { width: 50px; height: 50px; border: 4px solid rgba(255,152,0,0.1); border-top: 4px solid var(--primary); border-radius: 50%; animation: rotate 0.8s linear infinite; display: none; }
+        @keyframes rotate { to { transform: rotate(360deg); } }
 
-        .p-center { display: flex; align-items: center; justify-content: center; gap: 50px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; }
-        .p-center i { font-size: 35px; color: #fff; cursor: pointer; }
-        
-        .p-bottom-bar { width: 100%; position: absolute; bottom: 20px; left: 0; padding: 0 20px; }
-        .seekbar { width: 100%; height: 4px; accent-color: var(--primary); cursor: pointer; }
+        /* Player Controls UI */
+        .p-ui { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; padding: 20px; transition: 0.4s opacity; }
+        .ui-hidden { opacity: 0; pointer-events: none; }
 
-        /* FOOTER (ACTIVE ICON PILL) */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; padding: 12px 0; border-top: 1px solid #222; z-index: 2000; }
-        .nav-item { color: #888; text-align: center; flex: 1; font-size: 11px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .nav-item i { font-size: 18px; }
+        .p-top { display: flex; align-items: center; justify-content: space-between; }
+        .p-title { font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 15px; }
+
+        .p-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 60px; }
+        .p-center i { font-size: 30px; color: #fff; cursor: pointer; text-shadow: 0 0 15px rgba(0,0,0,0.8); }
+        #play-btn { font-size: 60px; }
+
+        .p-bottom { width: 100%; }
+        .seekbar-container { display: flex; align-items: center; gap: 12px; }
+        .seekbar { flex: 1; accent-color: var(--primary); height: 4px; cursor: pointer; }
+        .time-label { font-size: 11px; font-weight: 700; }
+
+        /* NAVIGATION & FAB */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #000; display: flex; padding: 10px 0; border-top: 1px solid #222; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; color: #666; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item i { font-size: 20px; }
         .nav-item.active { color: #fff; }
-        .nav-item.active i { background: var(--primary); color: #fff; padding: 6px 25px; border-radius: 20px; margin-top: -5px; }
+        .nav-item.active i { background: var(--primary); padding: 6px 25px; border-radius: 20px; margin-top: -5px; }
 
-        /* WHATSAPP FIXED */
-        .wa-float { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: #fff; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); z-index: 1500; }
-
-        .notif-card { background: #222; padding: 15px; border-radius: 12px; margin: 12px; border-left: 5px solid var(--primary); }
+        .wa-btn { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: #fff; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 999; }
+        
+        /* NOTIFICATION CARD */
+        .n-card { background: #1a1a1a; padding: 15px; border-radius: 12px; margin: 10px; border-left: 4px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body>
 
     <header>
         <div class="pill-logo">Jazz Tv</div>
-        <div class="notif-btn" onclick="loadTab('notif')">
+        <div class="notif-icon" onclick="loadTab('notif')">
             <i class="fa-solid fa-bell"></i>
             <span id="notif-badge">0</span>
         </div>
     </header>
 
-    <div id="main-content"></div>
+    <div id="app-content"></div>
 
-    <a href="https://wa.me/923342002756" class="wa-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+    <a href="https://wa.me/923342002756" class="wa-btn"><i class="fa-brands fa-whatsapp"></i></a>
 
-    <!-- PLAYER -->
+    <!-- PLAYER OVERLAY -->
     <div id="player-overlay">
-        <div class="spinner" id="p-loader"></div>
-        <video id="main-video" playsinline onclick="toggleUI()"></video>
-        <div class="player-ui" id="p-controls">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <i class="fa-solid fa-chevron-left" onclick="closePlayer()" style="font-size:25px;"></i>
-                <span id="p-title" style="font-size:16px; font-weight:800; color:var(--primary);">Loading...</span>
+        <div class="spinner-box"><div class="arc-spinner" id="loader"></div></div>
+        
+        <video id="main-video" playsinline onclick="toggleControls()"></video>
+
+        <div class="p-ui" id="p-controls">
+            <div class="p-top">
+                <div class="p-title">
+                    <i class="fa-solid fa-arrow-left" onclick="closePlayer()"></i>
+                    <span id="video-name">Wasi TV Pro</span>
+                </div>
+                <div style="display:flex; gap:20px; font-size:20px;">
+                    <i class="fa-solid fa-chromecast"></i>
+                    <i class="fa-solid fa-lock-open"></i>
+                </div>
             </div>
-            
+
             <div class="p-center">
                 <i class="fa-solid fa-rotate-left" onclick="video.currentTime -= 10"></i>
-                <i class="fa-solid fa-play" id="play-btn" onclick="togglePlay()" style="font-size:60px;"></i>
+                <i class="fa-solid fa-play" id="play-btn" onclick="togglePlay()"></i>
                 <i class="fa-solid fa-rotate-right" onclick="video.currentTime += 10"></i>
             </div>
 
-            <div class="p-bottom-bar">
-                <input type="range" class="seekbar" id="seekbar" value="0" min="0" max="100" oninput="manualSeek(this.value)">
-                <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;">
-                    <span id="cur-time">00:00</span>
-                    <span style="color:red;"><i class="fa-solid fa-circle" style="font-size:8px;"></i> LIVE</span>
+            <div class="p-bottom">
+                <div class="seekbar-container">
+                    <span class="time-label" id="cur-time">00:00</span>
+                    <input type="range" class="seekbar" id="seekbar" value="0" step="0.1" oninput="manualSeek(this.value)">
+                    <span class="time-label" id="total-time">00:00</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                    <span style="color:red; font-size:10px; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-circle"></i> LIVE</span>
+                    <i class="fa-solid fa-expand"></i>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- NAVIGATION -->
+    <!-- NAV BAR -->
     <div class="bottom-nav">
         <div class="nav-item" onclick="loadTab('home', this)"><i class="fa-solid fa-house"></i>Home</div>
         <div class="nav-item active" onclick="loadTab('tv', this)"><i class="fa-solid fa-tv"></i>Live TV</div>
-        <div class="nav-item" onclick="loadTab('trending', this)"><i class="fa-solid fa-fire"></i>Movies</div>
-        <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-circle-exclamation"></i>Missing</div>
+        <div class="nav-item" onclick="loadTab('movies', this)"><i class="fa-solid fa-clapperboard"></i>Movies</div>
+        <div class="nav-item" onclick="loadTab('missing', this)"><i class="fa-solid fa-triangle-exclamation"></i>Missing</div>
     </div>
 
     <script>
@@ -123,33 +144,31 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function showSkeletons() {
-            let h = '<div class="playlist-grid">';
-            for(let i=0; i<9; i++) h += '<div class="skeleton" style="aspect-ratio:1/1.3;"></div>';
-            $('#main-content').html(h + '</div>');
+        // Load Skeleton
+        function showLoading() {
+            let h = '<div class="grid">';
+            for(let i=0; i<9; i++) h += '<div class="skeleton" style="aspect-ratio:1/1.2;"></div>';
+            $('#app-content').html(h + '</div>');
         }
 
         async function loadTab(tab, el) {
             if(el) { $('.nav-item').removeClass('active'); $(el).addClass('active'); }
-            showSkeletons();
+            showLoading();
 
-            if(tab === 'home') {
-                const r = await fetch(`${API}/feed`).then(r=>r.json());
-                renderGrid('Featured', r.sports);
+            if(tab === 'tv' || tab === 'home') {
+                const res = await fetch(`${API}/feed`).then(r => r.json());
+                const items = tab === 'tv' ? res.channels : res.sports;
+                renderGrid(tab === 'tv' ? 'All Channels' : 'Live Sports', items);
             } 
-            else if(tab === 'tv') {
-                const r = await fetch(`${API}/feed`).then(r=>r.json());
-                renderGrid('Live TV Channels', r.channels);
-            }
-            else if(tab === 'trending') {
-                const r = await fetch(`${API}/movies`).then(r=>r.json());
-                let html = '';
-                r.forEach(s => {
-                    html += `<div class="section-title">${s.title}</div><div class="playlist-grid">`;
-                    s.items.forEach(i => html += createCard(i));
-                    html += '</div>';
+            else if(tab === 'movies') {
+                const res = await fetch(`${API}/movies`).then(r => r.json());
+                let h = '';
+                res.forEach(s => {
+                    h += `<div class="section-title">${s.title}</div><div class="grid">`;
+                    s.items.forEach(i => h += createCard(i));
+                    h += '</div>';
                 });
-                $('#main-content').html(html);
+                $('#app-content').html(h);
             }
             else if(tab === 'missing') {
                 db.ref('missing_sports').once('value', s => {
@@ -157,12 +176,21 @@
                 });
             }
             else if(tab === 'notif') {
-                loadInbox();
+                db.ref('app_notifications').once('value', s => {
+                    const data = s.val() || {};
+                    localStorage.setItem('seen_count', Object.keys(data).length);
+                    $('#notif-badge').hide();
+                    let h = '<div class="section-title">Inbox</div>';
+                    Object.values(data).reverse().forEach(n => {
+                        h += `<div class="n-card"><b>${n.title}</b><p style="margin:5px 0 0; font-size:12px; color:#aaa;">${n.message}</p></div>`;
+                    });
+                    $('#app-content').html(h || '<p style="text-align:center; margin-top:50px; color:#555;">No Messages</p>');
+                });
             }
         }
 
         function createCard(i) {
-            const name = i.name || i.channelName || "Channel";
+            const name = i.name || i.channelName || "No Name";
             const img = i.logo || i.image || "https://via.placeholder.com/150";
             return `<div class="card" onclick="playStream('${i.slug}','${name}')">
                 <img src="${img}" onerror="this.src='https://via.placeholder.com/150'">
@@ -171,57 +199,77 @@
         }
 
         function renderGrid(title, items) {
-            let html = `<div class="section-title">${title}</div><div class="playlist-grid">`;
-            items.forEach(i => html += createCard(i));
-            $('#main-content').html(html + '</div>');
+            let h = `<div class="section-title">${title}</div><div class="grid">`;
+            items.forEach(i => h += createCard(i));
+            $('#app-content').html(h + '</div>');
         }
 
-        // PLAYER LOGIC
+        // --- PLAYER SYSTEM ---
         function playStream(slug, name) {
-            if(window.Android) window.Android.rotateLandscape();
-            $('#p-title').text(name);
+            $('#video-name').text(name);
             $('#player-overlay').fadeIn();
-            $('#p-loader').show();
-            let url = slug.startsWith('http') ? slug : API + "/stream?slug=" + slug + "&type=channel";
-            if (Hls.isSupported()) { hls.destroy(); hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); hls.on(Hls.Events.MANIFEST_PARSED,()=>video.play()); }
-            else { video.src = url; video.play(); }
+            $('#loader').show();
+            if(window.Android) window.Android.rotateLandscape();
+
+            let url = slug.startsWith('http') ? slug : `${API}/stream?slug=${slug}&type=channel`;
+            
+            if (Hls.isSupported()) {
+                hls.destroy();
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            } else {
+                video.src = url;
+                video.play();
+            }
         }
 
-        function closePlayer() { video.pause(); $('#player-overlay').fadeOut(); if(window.Android) window.Android.rotatePortrait(); }
+        function closePlayer() { 
+            video.pause(); 
+            $('#player-overlay').fadeOut(); 
+            if(window.Android) window.Android.rotatePortrait(); 
+        }
+
         function togglePlay() { video.paused ? video.play() : video.pause(); }
-        function toggleUI() { $('#p-controls').toggleClass('ui-hide'); }
         function manualSeek(v) { video.currentTime = (v / 100) * video.duration; }
 
-        video.onwaiting = () => $('#p-loader').show();
-        video.onplaying = () => { $('#p-loader').hide(); $('#play-btn').attr('class', 'fa-solid fa-pause'); setTimeout(()=> $('#p-controls').addClass('ui-hide'), 3000); };
-        video.onpause = () => { $('#play-btn').attr('class', 'fa-solid fa-play'); $('#p-controls').removeClass('ui-hide'); };
-        video.ontimeupdate = () => {
-            $('#seekbar').val((video.currentTime / video.duration) * 100 || 0);
-            let m=Math.floor(video.currentTime/60), s=Math.floor(video.currentTime%60);
-            $('#cur-time').text((m<10?'0':'')+m+":"+(s<10?'0':'')+s);
-        };
-
-        // NOTIFICATIONS
-        function loadInbox() {
-            db.ref('app_notifications').once('value', s => {
-                const data = s.val() || {};
-                localStorage.setItem('seen_notif', Object.keys(data).length);
-                $('#notif-badge').hide();
-                let html = '<div class="section-title">Inbox</div>';
-                Object.values(data).reverse().map(n => {
-                    html += `<div class="notif-card"><h4>${n.title}</h4><p style="font-size:12px;color:#bbb">${n.message}</p></div>`;
-                });
-                $('#main-content').html(html || '<p style="padding:20px;color:#555">No messages</p>');
-            });
+        function toggleControls() {
+            $('#p-controls').toggleClass('ui-hidden');
         }
 
+        video.onwaiting = () => $('#loader').show();
+        video.onplaying = () => { 
+            $('#loader').hide(); 
+            $('#play-btn').attr('class', 'fa-solid fa-pause');
+            setTimeout(() => $('#p-controls').addClass('ui-hidden'), 3000);
+        };
+        video.onpause = () => {
+            $('#play-btn').attr('class', 'fa-solid fa-play');
+            $('#p-controls').removeClass('ui-hidden');
+        };
+
+        video.ontimeupdate = () => {
+            const cur = video.currentTime, dur = video.duration || 0;
+            $('#seekbar').val((cur / dur) * 100 || 0);
+            $('#cur-time').text(formatTime(cur));
+            $('#total-time').text(formatTime(dur));
+        };
+
+        function formatTime(s) {
+            let m = Math.floor(s / 60);
+            s = Math.floor(s % 60);
+            return (m < 10 ? '0' : '') + m + ":" + (s < 10 ? '0' : '') + s;
+        }
+
+        // Firebase Notif Badge
         db.ref('app_notifications').on('value', s => {
             const count = Object.keys(s.val() || {}).length;
-            const seen = localStorage.getItem('seen_notif') || 0;
+            const seen = localStorage.getItem('seen_count') || 0;
             if(count > seen) $('#notif-badge').text(count - seen).css('display','flex');
         });
 
         $(document).ready(() => loadTab('tv'));
     </script>
 </body>
-</html>
+    </html>
